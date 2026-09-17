@@ -1,27 +1,32 @@
 -- Seed: the two caps, the photograph supplied for each, and every Egyptian
 -- governorate as a shipping destination.
 --
--- IMPORTANT -- this seed deliberately ships the store CLOSED.
+-- IMPORTANT -- this seed ships the store CLOSED, and `active` is now the ONLY
+-- thing holding it closed. Read that twice before changing anything here.
 --
--- The PRICE is real: 950.00 EGP, supplied by the business, stored as 95000
--- piastres. Everything else that would let a cap actually sell is not:
--- `stock_quantity` is 0, `active` is false, and every shipping zone has a fee
--- of 0, because none of those have been supplied (see
--- docs/MISSING-INFORMATION.md).
+-- Every commercial figure below is real and supplied by the business:
 --
--- An inactive product with no stock cannot be read by the storefront, added
--- to a cart or ordered, so there is no window in which a deploy could sell a
--- cap it does not have.
+--   price     950.00 EGP  -> 95000 piastres, both caps
+--   stock     20 each     -> 40 in total
+--   shipping  100.00 EGP  -> 10000 piastres, flat, every governorate
 --
--- Opening the store is a deliberate act: set the stock and the shipping fees,
--- then activate, from /admin or with the statements at the bottom of this
--- file.
+-- Earlier revisions of this seed were safe twice over: a price of zero and a
+-- stock of zero each made a sale impossible on their own. That is no longer
+-- true. Flipping `active` to true opens the shop immediately, at the real
+-- price, against real stock -- so it is deliberately left false, and flipping
+-- it is the launch decision itself rather than a step on the way to one.
+--
+-- Before flipping it, see docs/PRODUCTION-CHECKLIST.md. Photography, Paymob
+-- credentials and a domain are all still outstanding.
 
--- 95000 piastres = 950.00 EGP. Both caps are the same price.
+-- 95000 piastres = 950.00 EGP, and 20 of each cap: a 40-piece first run.
+--
+-- `active` stays false. See the note at the top of this file -- it is the only
+-- thing between this seed and a live shop now.
 insert into tc_products (slug, name_ar, description_ar, price_piastres, stock_quantity, active, display_order)
 values
-  ('taiwan',  'تايوان يا ريس',        'كاب مطرّز بعبارة «تايوان يا ريس».',  95000, 0, false, 1),
-  ('al-adou', 'العدو ليس بهذه القوة', 'كاب مطرّز بإحدى أشهر عبارات طاهر.', 95000, 0, false, 2)
+  ('taiwan',  'تايوان يا ريس',        'كاب مطرّز بعبارة «تايوان يا ريس».',  95000, 20, false, 1),
+  ('al-adou', 'العدو ليس بهذه القوة', 'كاب مطرّز بإحدى أشهر عبارات طاهر.', 95000, 20, false, 2)
 on conflict (slug) do nothing;
 
 -- Photography.
@@ -44,50 +49,58 @@ select p.id, 'main', '/images/products/' || p.slug || '/main', v.alt, 1600, 1600
   ) as v(slug, alt) on v.slug = p.slug
 on conflict (product_id, view) do nothing;
 
--- All 27 governorates. A destination with no row cannot be quoted, so every
--- one is present from the start; the FEE is what remains to be filled in.
+-- All 27 governorates at a flat 100.00 EGP (10000 piastres).
+--
+-- Flat because that is what was supplied: one figure, not a table of them. If
+-- delivering to Aswan costs more than delivering across Cairo -- and with most
+-- Egyptian couriers it does -- vary it per governorate in /admin rather than
+-- here, once the courier's own rate card is known.
+--
+-- A destination with NO row cannot be quoted and cannot be ordered to, which
+-- is the mechanism for refusing a governorate: delete its row, do not set its
+-- fee to zero. Zero means free delivery.
 insert into tc_shipping_zones (governorate, fee_piastres, cod_available, min_days, max_days)
 values
-  ('Cairo', 0, true, null, null),
-  ('Giza', 0, true, null, null),
-  ('Alexandria', 0, true, null, null),
-  ('Dakahlia', 0, true, null, null),
-  ('Red Sea', 0, true, null, null),
-  ('Beheira', 0, true, null, null),
-  ('Fayoum', 0, true, null, null),
-  ('Gharbia', 0, true, null, null),
-  ('Ismailia', 0, true, null, null),
-  ('Menofia', 0, true, null, null),
-  ('Minya', 0, true, null, null),
-  ('Qalyubia', 0, true, null, null),
-  ('New Valley', 0, true, null, null),
-  ('Suez', 0, true, null, null),
-  ('Aswan', 0, true, null, null),
-  ('Assiut', 0, true, null, null),
-  ('Beni Suef', 0, true, null, null),
-  ('Port Said', 0, true, null, null),
-  ('Damietta', 0, true, null, null),
-  ('Sharqia', 0, true, null, null),
-  ('South Sinai', 0, true, null, null),
-  ('Kafr El Sheikh', 0, true, null, null),
-  ('Matrouh', 0, true, null, null),
-  ('Luxor', 0, true, null, null),
-  ('Qena', 0, true, null, null),
-  ('North Sinai', 0, true, null, null),
-  ('Sohag', 0, true, null, null)
+  ('Cairo', 10000, true, null, null),
+  ('Giza', 10000, true, null, null),
+  ('Alexandria', 10000, true, null, null),
+  ('Dakahlia', 10000, true, null, null),
+  ('Red Sea', 10000, true, null, null),
+  ('Beheira', 10000, true, null, null),
+  ('Fayoum', 10000, true, null, null),
+  ('Gharbia', 10000, true, null, null),
+  ('Ismailia', 10000, true, null, null),
+  ('Menofia', 10000, true, null, null),
+  ('Minya', 10000, true, null, null),
+  ('Qalyubia', 10000, true, null, null),
+  ('New Valley', 10000, true, null, null),
+  ('Suez', 10000, true, null, null),
+  ('Aswan', 10000, true, null, null),
+  ('Assiut', 10000, true, null, null),
+  ('Beni Suef', 10000, true, null, null),
+  ('Port Said', 10000, true, null, null),
+  ('Damietta', 10000, true, null, null),
+  ('Sharqia', 10000, true, null, null),
+  ('South Sinai', 10000, true, null, null),
+  ('Kafr El Sheikh', 10000, true, null, null),
+  ('Matrouh', 10000, true, null, null),
+  ('Luxor', 10000, true, null, null),
+  ('Qena', 10000, true, null, null),
+  ('North Sinai', 10000, true, null, null),
+  ('Sohag', 10000, true, null, null)
 on conflict (governorate) do nothing;
 
 -- ---------------------------------------------------------------------------
 -- Opening the store. Run these once the real figures are known -- or do the
 -- same thing from /admin, which is what it is for.
 --
---   update tc_products
---      set stock_quantity = 100,     -- the count the manufacturer delivered
---          active = true
---    where slug = 'taiwan';
+--   update tc_products set active = true where slug = 'taiwan';
 --
---   update tc_shipping_zones set fee_piastres = 6000, min_days = 2, max_days = 4
---    where governorate = 'Cairo';
+-- And to vary the flat fee, or add the delivery estimate once the courier
+-- confirms one:
+--
+--   update tc_shipping_zones set fee_piastres = 12000, min_days = 4, max_days = 6
+--    where governorate = 'Aswan';
 --
 -- And to grant somebody the admin area, after they have been created in
 -- Supabase Auth (see docs/ADMIN-SETUP.md):

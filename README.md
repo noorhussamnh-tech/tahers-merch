@@ -44,8 +44,8 @@ both caps read as unavailable and a notice says why.
 
 To get a working shop, apply `supabase/migrations/*.sql` in order to a
 Supabase project, set the two `VITE_SUPABASE_*` values and
-`SUPABASE_SERVICE_ROLE_KEY`, then open `/admin`, set a stock count and
-activate the caps — the price is already seeded at 950.00 EGP. See
+`SUPABASE_SERVICE_ROLE_KEY`. Price, stock and shipping are already seeded; the
+only thing left is to activate the caps in `/admin` when you mean to open. See
 [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ### Commands
@@ -288,12 +288,17 @@ whose aspect ratio differs from the frame is letterboxed, not sliced.
 
 ## Current state
 
-The shop ships **closed**. The price is real — 950.00 EGP, both caps, seeded
-as `95000` piastres — but stock is zero, both caps are inactive, and every
-shipping fee is zero, because none of those have been supplied. An inactive
-product with no stock cannot be read by the storefront, added to a cart or
-ordered, so there is no window in which a deploy could sell a cap it does not
-have. Opening it is a deliberate act, done from `/admin`.
+The shop ships **closed**, and `active = false` is the only thing holding it
+closed. Every commercial figure is real: 950.00 EGP a cap, 20 of each, and a
+flat 100.00 EGP to deliver anywhere in Egypt.
+
+That is a change worth noticing. Earlier the shop was safe twice over — a price
+of zero and a stock of zero each made a sale impossible on their own. Now
+flipping `active` in `/admin` opens a real shop at a real price against real
+stock. It is the launch decision, not a step on the way to one.
+
+**Nothing is deployed.** There is no URL yet: the site needs a Supabase project
+and a host before it has one. See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 Live payment is **not** verified. The Paymob integration is complete and
 tested against its own test suite, but no real transaction has been put

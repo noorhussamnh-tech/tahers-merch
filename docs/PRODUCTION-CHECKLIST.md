@@ -1,8 +1,10 @@
 # Production checklist
 
-Work top to bottom. The shop ships **closed** — both caps inactive, every
-price zero — so nothing here is urgent until you want to open it, and nothing
-can be sold before section 2 is done.
+Work top to bottom.
+
+The shop ships **closed**, and `active = false` is now the only thing holding
+it closed: price, stock and shipping are all real. Flipping it opens a real
+shop immediately. That flip is the last box in section 8, and it belongs there.
 
 ---
 
@@ -20,18 +22,29 @@ can be sold before section 2 is done.
 - [ ] Public sign-up disabled in Supabase Auth
 - [ ] `tc_release_expired_reservations()` scheduled
 
-## 2. Business information — the shop cannot open without these
+## 2. Business information
 
-- [ ] Price set on both caps
-- [ ] Stock set on both caps
-- [ ] Shipping fee set for every governorate you deliver to
+Supplied and seeded — verify these landed rather than setting them:
+
+- [x] Price: 950.00 EGP on both caps
+- [x] Stock: 20 each, 40 total
+- [x] Shipping: 100.00 EGP flat, all 27 governorates
+
+Still to decide:
+
 - [ ] Governorates you do **not** deliver to: delete their `tc_shipping_zones`
-      row, so checkout refuses them rather than quoting free delivery
-- [ ] Cash-on-delivery availability set per governorate
-- [ ] Both caps activated — **do this last**
+      row, so checkout refuses them rather than quoting a fee you cannot honour
+- [ ] Cash-on-delivery availability per governorate — currently **on
+      everywhere**, which is the seeded default, not a decision. COD to distant
+      governorates carries real refusal-rate and return-freight cost
+- [ ] Whether a flat 100 EGP holds for every destination, or needs to vary once
+      the courier's rate card is known
 
-Leaving a governorate at a fee of zero means free delivery there. The admin
-Shipping tab counts how many are still at zero.
+Leaving a governorate at a fee of zero means free delivery, not "unset". The
+admin Shipping tab counts how many are at zero.
+
+Activating the caps is **not** here. It is the last box in section 8, because
+it is now the only thing between this and a live shop.
 
 ## 3. Photography
 

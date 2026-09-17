@@ -3,10 +3,14 @@
 Everything the site needs that has not been supplied. Each item says what is
 in the code today, where to change it, and what breaks if it ships as-is.
 
-Nothing on this list has been invented. Where a figure was needed to make the
-code run, the code ships in a state that *cannot transact* rather than one
-that transacts on a guess — both products are seeded inactive, so there is no
-window in which a deploy could sell a cap for nothing.
+Nothing on this list has been invented.
+
+**Every commercial figure is now real.** Price, stock and shipping have all
+been supplied, which means `active = false` is the only thing holding the shop
+closed — earlier it was safe twice over, because a price of zero and a stock of
+zero each made a sale impossible on their own. Flipping `active` now opens a
+real shop at a real price against real stock. Treat it as the launch decision,
+not as a step on the way to one.
 
 ---
 
@@ -14,25 +18,32 @@ window in which a deploy could sell a cap for nothing.
 
 | # | What is missing | Placeholder today | Where to set it |
 |---|---|---|---|
-| 1 | **Stock count for each cap** | `0` | `/admin` → Products |
-| 2 | **Shipping fee per governorate** | `0` for all 27 | `/admin` → Shipping |
-| 3 | **Photograph files** | "Photo pending" panels | See *Photography* below |
-| 4 | **Paymob credentials** | Blank | `.env` — see `docs/PAYMOB.md` |
-| 5 | **Domain name** | `REPLACE-WITH-DOMAIN` | See *Domain* below |
+| 1 | **Photograph files** | "Photo pending" panels | See *Photography* below |
+| 2 | **Paymob credentials** | Blank | `.env` — see `docs/PAYMOB.md` |
+| 3 | **Domain name** | `REPLACE-WITH-DOMAIN` | See *Domain* below |
+| 4 | **A deployed site** | Nothing is hosted anywhere | See `docs/DEPLOYMENT.md` |
+
+Nothing here stops a **cash-on-delivery** shop working — that path needs only
+a Supabase project and a deploy. Paymob is what online card payment needs, and
+photography is what makes it worth visiting.
 
 ### Supplied
 
-- **Price — 950.00 EGP**, both caps, seeded as `95000` piastres in
-  `0007_seed.sql`. Change it in `/admin` → Products, not in the migration, once
-  the database is live.
+- **Price — 950.00 EGP**, both caps, seeded as `95000` piastres.
+- **Stock — 20 of each cap**, 40 in the first run.
+- **Shipping — 100.00 EGP flat**, seeded as `10000` piastres against all 27
+  governorates. Flat because one figure was supplied, not a table of them; with
+  most Egyptian couriers, reaching Aswan costs more than crossing Cairo, so
+  vary it per governorate in `/admin` once the courier's rate card is known.
 - **Cap colours** — green with white thread (تايوان يا ريس), burgundy with
   cream thread (العدو ليس بهذه القوة). Recorded on `ProductContent.colour` in
   `src/lib/catalog/products.ts` and shown on each product section. The brief
   forbids altering either, so they are written down rather than implied.
 
-A fee of `0` means free delivery, not "unset" — the database has no way to
-express "unknown" for a `not null` column. The admin Shipping tab counts how
-many governorates are still at zero and says so.
+To refuse a governorate, **delete its `tc_shipping_zones` row** — a destination
+with no row cannot be quoted or ordered to. Do not set its fee to zero: zero
+means free delivery, and the database has no way to express "unknown" for a
+`not null` column.
 
 ---
 
