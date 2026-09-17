@@ -1,0 +1,16 @@
+# Taher Caps
+#
+# The shop is two product pages and a homepage. Everything to do with an order
+# is disallowed: those URLs carry order numbers and personal details, and none
+# of them is any use in a search result.
+
+User-agent: *
+Allow: /
+Disallow: /checkout
+Disallow: /order/
+Disallow: /track
+Disallow: /admin
+Disallow: /api/
+
+# Replace with the real domain once one is registered.
+Sitemap: https://REPLACE-WITH-DOMAIN/sitemap.xml

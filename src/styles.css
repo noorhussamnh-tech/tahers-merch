@@ -1,0 +1,189 @@
+@import "tailwindcss" source(none);
+@source "../src";
+
+/*
+ * Taher Caps design system.
+ *
+ * Editorial, not fashion-house: a warm cream page, one dark-red accent used
+ * sparingly, hairline borders, and type doing the work instead of cards and
+ * shadows. There are exactly two products, so the layout can afford to give
+ * each one a whole section rather than a grid cell.
+ *
+ * Every value below is a token. Nothing in a component should hard-code a
+ * colour or a face -- the brief fixes both, and a stray hex is how a palette
+ * drifts.
+ */
+
+@theme {
+  /* --- Palette. Fixed by the brief; do not extend without a decision. --- */
+  --color-cream: #f4efe6;
+  --color-ink: #17130f;
+  --color-muted: #756c62;
+  --color-accent: #7d252a;
+  --color-line: #cfc6b9;
+  --color-paper: #fffdf8;
+  --color-success: #315f47;
+  --color-error: #9b2c2c;
+
+  /* Semantic aliases, so components read as intent rather than as colour. */
+  --color-background: var(--color-cream);
+  --color-foreground: var(--color-ink);
+  --color-border: var(--color-line);
+
+  /*
+   * Faces.
+   *
+   * `--font-display` is the English editorial serif and carries the logo.
+   * `--font-arabic` is the Arabic editorial serif, used for Taher's phrases
+   * and the headlines around them. `--font-sans` is the functional face for
+   * navigation, buttons, forms and anything a customer has to operate; the
+   * brief keeps those in English, but the family covers Arabic too so a
+   * mixed-script label (an address field, a status line) stays in one voice.
+   */
+  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+  --font-arabic: "Noto Serif Arabic", "Cormorant Garamond", serif;
+  --font-sans: "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+
+  /* The page frame maxes out here; margins breathe either side of it. */
+  --spacing-page: 1440px;
+
+  --radius-frame: 1.25rem;
+}
+
+/*
+ * Editorial display sizes.
+ *
+ * Headlines are fluid so they stay large on a desktop and stop short of
+ * overflowing at 320px. The clamp middles are in vw, so nothing needs a
+ * breakpoint to look deliberate between the two ends.
+ */
+@theme {
+  --text-display: clamp(2.75rem, 7vw, 5.5rem);
+  --text-display--line-height: 1.04;
+  --text-headline: clamp(2rem, 4.5vw, 3.5rem);
+  --text-headline--line-height: 1.12;
+  --text-title: clamp(1.5rem, 2.6vw, 2.25rem);
+  --text-title--line-height: 1.2;
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1.2;
+  --text-label--letter-spacing: 0.18em;
+}
+
+:root {
+  color-scheme: light;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    /* Anti-aliasing matters on a warm background: the default rendering makes
+       the thin serif look muddy against cream. */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /*
+   * Arabic needs more room between lines than the Latin default, and Taher's
+   * phrases are the whole point of the page -- they must never look cramped.
+   * Applied by direction rather than by class so any RTL block inherits it.
+   */
+  [dir="rtl"] {
+    font-family: var(--font-arabic);
+    line-height: 1.85;
+  }
+
+  /*
+   * Functional controls stay English and left-to-right even when they sit
+   * inside an RTL section, which the brief requires explicitly.
+   */
+  [dir="rtl"] button,
+  [dir="rtl"] input,
+  [dir="rtl"] select,
+  [dir="rtl"] textarea {
+    font-family: var(--font-sans);
+  }
+
+  /* A visible focus ring in the accent, not the browser's blue. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /*
+   * The eyebrow label: tiny, letterspaced, uppercase for English. Arabic does
+   * not have case, so the Arabic variant relies on size and tracking alone --
+   * `uppercase` on Arabic text is a no-op that only risks odd shaping.
+   */
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
+    letter-spacing: var(--text-label--letter-spacing);
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .eyebrow-ar {
+    font-family: var(--font-arabic);
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+  }
+
+  /*
+   * Taher's phrases. These are the loudest thing on the page and the reason
+   * anyone is here, so they get the serif, tight leading and no italics --
+   * the brief rules italics out, and a slanted Arabic serif looks broken.
+   */
+  .phrase {
+    font-family: var(--font-arabic);
+    font-style: normal;
+    line-height: 1.35;
+    /* Keeps a short phrase from breaking across lines at an awkward word.
+       `balance` distributes the words evenly when it does have to wrap. */
+    text-wrap: balance;
+  }
+
+  /* Navigation and buttons: the clean sans, in English, letterspaced small. */
+  .control {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+}
+
+/* Hides content visually but leaves it for screen readers. */
+@utility sr-only-focusable {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

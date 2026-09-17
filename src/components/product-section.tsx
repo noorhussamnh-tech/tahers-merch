@@ -1,0 +1,224 @@
+/**
+ * A product, as an editorial section.
+ *
+ * Not a card in a grid. Each cap gets a full-width section, and the two
+ * alternate which side the photography sits on, so the page reads as a spread
+ * rather than as a catalogue.
+ *
+ * The type hierarchy is the brief's, and it is the thing to preserve if this
+ * component is ever reworked:
+ *
+ *   1. the product name, largest;
+ *   2. the main phrase, in the editorial serif;
+ *   3. the second line, smaller;
+ *   4. the aside, tiny, once, as a photographic annotation.
+ *
+ * Giving all three phrases the same weight is the failure mode; the aside in
+ * particular is a caption, not a headline.
+ */
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { ProductGallery } from "@/components/product-gallery";
+import { QuantityStepper } from "@/components/cart-drawer";
+import { UI } from "@/lib/catalog/copy";
+import { formatEGP } from "@/lib/domain/money";
+import { productContent, type ProductSlug } from "@/lib/catalog/products";
+import { useCart } from "@/lib/cart/store";
+import { cn } from "@/lib/utils";
+import type { Product } from "@/lib/domain/types";
+
+interface ProductSectionProps {
+  readonly slug: ProductSlug;
+  /** Absent when Supabase is unconfigured or the cap is deactivated. */
+  readonly product: Product | undefined;
+  /** Photography on the left on an even index, the right on an odd one. */
+  readonly index: number;
+  readonly priority?: boolean;
+  /**
+   * Adds the sticky mobile add-to-cart bar. Only the product detail view sets
+   * it: the homepage renders both caps, and two sticky bars would stack on
+   * top of each other at the bottom of a phone screen.
+   */
+  readonly sticky?: boolean;
+}
+
+export function ProductSection({
+  slug,
+  product,
+  index,
+  priority = false,
+  sticky = false,
+}: ProductSectionProps) {
+  const content = productContent(slug);
+  const imageFirst = index % 2 === 0;
+
+  return (
+    <section
+      id={slug}
+      className="scroll-mt-28 border-t border-line"
+      aria-labelledby={`${slug}-name`}
+    >
+      <div className="mx-auto grid max-w-page grid-cols-1 items-start gap-10 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-16 lg:px-16">
+        <div className={cn("order-1", imageFirst ? "lg:order-1" : "lg:order-2")}>
+          <ProductGallery product={content} priority={priority} />
+
+          {/* The aside lives here, attached to the photography, tiny, once.
+              It is a caption on a picture -- not a second headline. */}
+          {content.accentPhrase && (
+            <p dir="rtl" className="mt-4 font-arabic text-xs leading-relaxed text-muted">
+              {content.accentPhrase}
+            </p>
+          )}
+        </div>
+
+        <div
+          className={cn("order-2 flex flex-col gap-7", imageFirst ? "lg:order-2" : "lg:order-1")}
+        >
+          <div dir="rtl" className="flex flex-col gap-5 text-right">
+            <h3 id={`${slug}-name`} className="phrase text-title font-normal text-ink">
+              {content.name}
+            </h3>
+
+            <p className="phrase text-[1.75rem] leading-snug text-accent md:text-[2.125rem]">
+              {content.primaryPhrase}
+            </p>
+
+            <p className="font-arabic text-lg leading-loose text-muted">
+              {content.secondaryPhrase}
+            </p>
+
+            {/* Product two only: the two lines written out together, once. */}
+            {content.fullPhrase && (
+              <p className="border-t border-line pt-5 font-arabic text-base leading-loose text-ink">
+                {content.fullPhrase}
+              </p>
+            )}
+
+            <p className="font-arabic text-base leading-loose text-muted">{content.description}</p>
+          </div>
+
+          <BuyPanel slug={slug} product={product} name={content.name} sticky={sticky} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Price, availability and the add-to-cart control.
+ *
+ * Every state a customer can meet is handled explicitly: not configured, not
+ * for sale yet, sold out, only a few left, and available. Silence in any of
+ * them reads as a broken shop.
+ */
+function BuyPanel({
+  slug,
+  product,
+  name,
+  sticky,
+}: {
+  slug: ProductSlug;
+  product: Product | undefined;
+  name: string;
+  sticky: boolean;
+}) {
+  const cart = useCart();
+  const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
+
+  if (!product) {
+    return (
+      <div className="border-t border-line pt-7">
+        <p dir="rtl" className="font-arabic text-base text-muted">
+          هذا التصميم غير متاح حاليًا.
+        </p>
+      </div>
+    );
+  }
+
+  const soldOut = product.available <= 0;
+  // A price of zero means nobody has set one yet -- the seed ships that way
+  // on purpose. Better to say so than to offer a free cap.
+  const priceUnset = product.price <= 0;
+
+  const handleAdd = () => {
+    cart.add(slug, quantity);
+    cart.open();
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 2000);
+  };
+
+  return (
+    <div className="flex flex-col gap-6 border-t border-line pt-7">
+      <div className="flex items-baseline justify-between gap-4">
+        <span className="font-sans text-xl text-ink">
+          {priceUnset ? "—" : formatEGP(product.price)}
+        </span>
+        <Availability available={product.available} soldOut={soldOut} />
+      </div>
+
+      {priceUnset ? (
+        <p dir="rtl" className="font-arabic text-sm text-muted">
+          سيتم الإعلان عن السعر قريبًا.
+        </p>
+      ) : (
+        <>
+          <div className="flex flex-wrap items-center gap-4">
+            <QuantityStepper
+              value={quantity}
+              max={Math.max(product.available, 1)}
+              onChange={(next) => setQuantity(Math.max(next, 1))}
+              label={name}
+            />
+
+            <Button
+              size="lg"
+              onClick={handleAdd}
+              disabled={soldOut}
+              className="flex-1 min-w-[12rem]"
+            >
+              {soldOut ? UI.soldOut : added ? "Added" : UI.addToCart}
+            </Button>
+          </div>
+
+          {/* The sticky bar a phone gets on the product detail view, so the
+              action stays reachable while scrolling a long section. */}
+          {sticky && !soldOut && (
+            <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream px-5 py-3 lg:hidden">
+              <Button size="lg" onClick={handleAdd} className="w-full">
+                {added ? "Added" : `${UI.addToCart} — ${formatEGP(product.price * quantity)}`}
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function Availability({ available, soldOut }: { available: number; soldOut: boolean }) {
+  if (soldOut) {
+    return (
+      <span dir="rtl" className="font-arabic text-sm text-error">
+        نفدت الكمية.
+      </span>
+    );
+  }
+
+  // A specific number is only useful when it is small enough to matter; above
+  // that it is just a stock figure the shop has no reason to publish.
+  if (available <= 5) {
+    return (
+      <span dir="rtl" className="font-arabic text-sm text-accent">
+        {available === 1 ? "بقيت قطعة واحدة." : `بقي ${available} قطع فقط.`}
+      </span>
+    );
+  }
+
+  return (
+    <span dir="rtl" className="font-arabic text-sm text-success">
+      متاح.
+    </span>
+  );
+}

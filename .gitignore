@@ -1,0 +1,15 @@
+node_modules
+.output
+.nitro
+.vinxi
+.vercel
+.wrangler
+dist
+coverage
+
+.env
+.env.local
+.env.*.local
+
+.DS_Store
+*.log
