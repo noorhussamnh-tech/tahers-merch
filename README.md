@@ -42,8 +42,8 @@ bun run dev            # http://localhost:8080
 The site renders without Supabase — the copy and the layout are static — but
 both caps read as unavailable and a notice says why.
 
-To get a working shop, apply `supabase/migrations/*.sql` in order to a
-Supabase project, set the two `VITE_SUPABASE_*` values and
+To get a working shop, paste `supabase/setup.sql` into the Supabase SQL
+Editor once (it is all eight migrations in order), set the two `VITE_SUPABASE_*` values and
 `SUPABASE_SERVICE_ROLE_KEY`. Price, stock and shipping are already seeded; the
 only thing left is to activate the caps in `/admin` when you mean to open. See
 [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
@@ -57,6 +57,7 @@ only thing left is to activate the caps in `/admin` when you mean to open. See
 | `bun run verify` | Lint, typecheck, unit tests, build — run this before pushing |
 | `bun run test` | Unit tests |
 | `./scripts/test-db.sh` | Schema, row-level security and concurrency tests (needs `DATABASE_URL`) |
+| `node scripts/build-setup-sql.mjs` | Regenerate the one-paste `supabase/setup.sql` from the migrations |
 | `node scripts/optimize-images.mjs` | Turn supplied photographs into the AVIF/WebP variants |
 
 ---

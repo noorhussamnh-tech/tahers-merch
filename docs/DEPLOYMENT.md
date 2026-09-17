@@ -10,12 +10,15 @@ are specific to running behind a proxy that rewrites `x-forwarded-for`.
 
 1. Create a project. Note the URL and the **publishable** key (Project
    Settings → API Keys), and the **service role** key from the same page.
-2. Apply the migrations, in order:
+2. Apply the schema. Easiest way, and the one that needs no tooling:
 
-   ```sh
-   supabase db push          # with the CLI linked to the project
-   # or paste supabase/migrations/*.sql into the SQL editor, 0001 first
-   ```
+   **SQL Editor → New query → paste the whole of `supabase/setup.sql` → Run.**
+
+   That file is every migration concatenated in order, generated from
+   `supabase/migrations/`. Regenerate it after changing a migration with
+   `node scripts/build-setup-sql.mjs`.
+
+   With the CLI linked instead: `supabase db push`.
 
 3. Confirm the seed landed and the shop is closed as intended:
 
