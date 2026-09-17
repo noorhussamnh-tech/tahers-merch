@@ -85,6 +85,7 @@ export function CartDrawer({ products }: { products: readonly Product[] }) {
                       image={mainImage(line.slug)}
                       sizes="80px"
                       className="aspect-square"
+                      compact
                     />
                   </div>
 

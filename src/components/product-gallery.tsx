@@ -109,6 +109,7 @@ export function ProductGallery({
                     image={image}
                     sizes="(min-width: 1024px) 110px, 20vw"
                     className="object-contain"
+                    compact
                   />
                 </div>
               </button>

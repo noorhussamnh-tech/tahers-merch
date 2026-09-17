@@ -32,15 +32,28 @@ interface ProductImageProps {
   readonly sizes: string;
   readonly priority?: boolean;
   readonly className?: string;
+  /**
+   * Drops the placeholder's descriptive text. Set it wherever the image box is
+   * too small to hold a sentence -- a cart thumbnail, a gallery chip -- where
+   * the text would otherwise spill out and read as a broken component.
+   * Has no effect once a real photograph is in place.
+   */
+  readonly compact?: boolean;
 }
 
 function srcSet(basePath: string, extension: string): string {
   return IMAGE_WIDTHS.map((width) => `${basePath}-${width}.${extension} ${width}w`).join(", ");
 }
 
-export function ProductImage({ image, sizes, priority = false, className }: ProductImageProps) {
+export function ProductImage({
+  image,
+  sizes,
+  priority = false,
+  className,
+  compact = false,
+}: ProductImageProps) {
   if (image.placeholder) {
-    return <PlaceholderPanel image={image} className={className} />;
+    return <PlaceholderPanel image={image} className={className} compact={compact} />;
   }
 
   return (
@@ -74,28 +87,36 @@ export function ProductImage({ image, sizes, priority = false, className }: Prod
 function PlaceholderPanel({
   image,
   className,
+  compact,
 }: {
   image: ProductImageData;
   // Explicitly `| undefined` rather than optional: `exactOptionalPropertyTypes`
   // distinguishes "absent" from "present and undefined", and the caller passes
   // the latter.
   className: string | undefined;
+  compact: boolean;
 }) {
   return (
     <div
       className={cn(
-        "flex h-full w-full flex-col items-center justify-center gap-3 bg-paper",
-        "border border-dashed border-line px-6 text-center",
+        "flex h-full w-full flex-col items-center justify-center gap-2 overflow-hidden bg-paper",
+        "border border-dashed border-line text-center",
+        compact ? "px-1" : "gap-3 px-6",
         className,
       )}
       style={{ aspectRatio: `${image.width} / ${image.height}` }}
       role="img"
+      // The full description still reaches a screen reader either way.
       aria-label={`${image.alt} — الصورة لم تُضف بعد`}
     >
-      <span className="eyebrow">Photo pending</span>
-      <span dir="rtl" className="font-arabic text-sm text-muted">
-        {image.alt}
+      <span className={cn("eyebrow", compact && "text-[8px] tracking-[0.1em]")}>
+        {compact ? "Photo" : "Photo pending"}
       </span>
+      {!compact && (
+        <span dir="rtl" className="font-arabic text-sm text-muted">
+          {image.alt}
+        </span>
+      )}
     </div>
   );
 }
