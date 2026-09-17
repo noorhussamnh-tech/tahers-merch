@@ -96,6 +96,10 @@ export function ProductSection({
             )}
 
             <p className="font-arabic text-base leading-loose text-muted">{content.description}</p>
+
+            {/* Colour and thread. A real product detail, kept small: it sits
+                with the description rather than competing with the phrase. */}
+            <p className="font-arabic text-sm leading-loose text-muted">اللون: {content.colour}</p>
           </div>
 
           <BuyPanel slug={slug} product={product} name={content.name} sticky={sticky} />

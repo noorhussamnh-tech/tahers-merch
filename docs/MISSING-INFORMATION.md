@@ -14,12 +14,21 @@ window in which a deploy could sell a cap for nothing.
 
 | # | What is missing | Placeholder today | Where to set it |
 |---|---|---|---|
-| 1 | **Price of each cap** | `0` piastres, product inactive | `/admin` → Products, or `update tc_products set price_piastres = …` |
-| 2 | **Stock count for each cap** | `0` | `/admin` → Products |
-| 3 | **Shipping fee per governorate** | `0` for all 27 | `/admin` → Shipping |
-| 4 | **Product photography** | "Photo pending" panels | See *Photography* below |
-| 5 | **Paymob credentials** | Blank | `.env` — see `docs/PAYMOB.md` |
-| 6 | **Domain name** | `REPLACE-WITH-DOMAIN` | See *Domain* below |
+| 1 | **Stock count for each cap** | `0` | `/admin` → Products |
+| 2 | **Shipping fee per governorate** | `0` for all 27 | `/admin` → Shipping |
+| 3 | **Photograph files** | "Photo pending" panels | See *Photography* below |
+| 4 | **Paymob credentials** | Blank | `.env` — see `docs/PAYMOB.md` |
+| 5 | **Domain name** | `REPLACE-WITH-DOMAIN` | See *Domain* below |
+
+### Supplied
+
+- **Price — 950.00 EGP**, both caps, seeded as `95000` piastres in
+  `0007_seed.sql`. Change it in `/admin` → Products, not in the migration, once
+  the database is live.
+- **Cap colours** — green with white thread (تايوان يا ريس), burgundy with
+  cream thread (العدو ليس بهذه القوة). Recorded on `ProductContent.colour` in
+  `src/lib/catalog/products.ts` and shown on each product section. The brief
+  forbids altering either, so they are written down rather than implied.
 
 A fee of `0` means free delivery, not "unset" — the database has no way to
 express "unknown" for a `not null` column. The admin Shipping tab counts how
@@ -31,18 +40,18 @@ many governorates are still at zero and says so.
 
 | # | What is missing | Placeholder today | Where to set it |
 |---|---|---|---|
-| 7 | **Material / fabric composition** | `"سيتم إضافة تفاصيل الخامة بعد تأكيدها."` | `src/lib/catalog/copy.ts` → `FAQ`, the `material` entry |
-| 8 | **Delivery period per governorate** | `null` — no estimate is shown at all | `/admin` → Shipping, Min/Max days |
-| 9 | **Return and exchange policy** | Generic sentence pointing at "the store policy" | `tc_store_settings` key `returns_policy_ar`, and the `returns` FAQ entry |
-| 10 | **Support contact** (WhatsApp / email) | `null` | `tc_store_settings` key `support_contact` |
-| 11 | **Which governorates allow cash on delivery** | All 27 allow it | `/admin` → Shipping, COD column |
-| 12 | **Discount codes** | None — `{}` | `tc_store_settings` key `discount_codes` |
+| 6 | **Material / fabric composition** | `"سيتم إضافة تفاصيل الخامة بعد تأكيدها."` | `src/lib/catalog/copy.ts` → `FAQ`, the `material` entry |
+| 7 | **Delivery period per governorate** | `null` — no estimate is shown at all | `/admin` → Shipping, Min/Max days |
+| 8 | **Return and exchange policy** | Generic sentence pointing at "the store policy" | `tc_store_settings` key `returns_policy_ar`, and the `returns` FAQ entry |
+| 9 | **Support contact** (WhatsApp / email) | `null` | `tc_store_settings` key `support_contact` |
+| 10 | **Which governorates allow cash on delivery** | All 27 allow it | `/admin` → Shipping, COD column |
+| 11 | **Discount codes** | None — `{}` | `tc_store_settings` key `discount_codes` |
 
-On (8): the storefront shows no delivery estimate at all while these are null,
+On (7): the storefront shows no delivery estimate at all while these are null,
 rather than a guessed number of days. The FAQ answer already says the period
 depends on the governorate and appears at checkout, which stays true.
 
-On (12): the `APPLY` control and the whole discount mechanism are built and
+On (11): the `APPLY` control and the whole discount mechanism are built and
 tested. No codes exist because none were supplied. The format is:
 
 ```json
@@ -57,24 +66,37 @@ tested. No codes exist because none were supplied. The format is:
 
 ## Photography
 
-The brief forbids generated replacement imagery, and none has been produced.
-Every photograph is a clearly-marked "photo pending" panel until real files
-arrive.
+**One photograph per cap exists** — the cap worn, shot from behind against the
+sea. The catalogue and the seed describe exactly those two and nothing more;
+the Arabic alt text describes what is actually in each frame.
+
+The **files themselves are not in the repository yet.** They were shared as
+images in conversation, not as files, so nobody has been able to write the
+bytes into `public/images/`. Until they are there, both render as a
+"photo pending" panel rather than a broken image.
 
 To add them:
 
-1. Put the originals in `public/images/products/<slug>/originals/<view>.jpg`,
-   where `<slug>` is `taiwan` or `al-adou` and `<view>` is one of
-   `main`, `front`, `side`, `back`, `detail`.
+1. Save the two photographs as:
+   - `public/images/products/taiwan/originals/main.jpg` — the green cap
+   - `public/images/products/al-adou/originals/main.jpg` — the burgundy cap
 2. `npm install --no-save sharp && node scripts/optimize-images.mjs`
-   — this writes the AVIF/WebP variants and the JPEG fallback, preserving the
+   — writes the AVIF/WebP variants and the JPEG fallback, preserving the
    aspect ratio and never cropping.
-3. Set `placeholder: false` on those entries in
-   `src/lib/catalog/products.ts`.
-4. Check the Arabic alt text in the same file describes what each photograph
-   actually shows.
+3. Set `PHOTO_READY = true` in `src/lib/catalog/products.ts`. It is one switch
+   because both caps are in the same state.
 
-`allPhotographySupplied()` in that file returns true once none are left.
+Then check: the placeholder panels are gone, and
+`allPhotographySupplied()` returns true.
+
+### Further views
+
+Only the `main` view exists. Front, side, and a close crop of the embroidery
+would each earn their place — the embroidery is the product, and one
+back-of-head shot does not show a customer the fit or the stitch quality. When
+they are shot, add an entry to the product's `images` array and a row to the
+`tc_product_images` seed; the gallery grows a thumbnail strip on its own once
+there is more than one.
 
 ---
 

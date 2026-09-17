@@ -44,8 +44,9 @@ both caps read as unavailable and a notice says why.
 
 To get a working shop, apply `supabase/migrations/*.sql` in order to a
 Supabase project, set the two `VITE_SUPABASE_*` values and
-`SUPABASE_SERVICE_ROLE_KEY`, then open `/admin` and set a price and a stock
-count. See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+`SUPABASE_SERVICE_ROLE_KEY`, then open `/admin`, set a stock count and
+activate the caps — the price is already seeded at 950.00 EGP. See
+[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ### Commands
 
@@ -243,18 +244,28 @@ failure mode.
 
 ## 7. Photography
 
-**No cap imagery has been generated, and none should be.** Every photograph is
-currently a clearly-marked "photo pending" panel.
+**No cap imagery has been generated, and none should be.**
 
-When the real files arrive:
+One photograph per cap has been supplied — each shows the cap worn, from
+behind, against the sea. The catalogue and the seed describe exactly those two,
+with Arabic alt text for what is actually in frame. The **files are not in the
+repository yet**, so both still render as a "photo pending" panel.
+
+To add them:
 
 ```sh
-# 1. put the originals here, named by view
-#    public/images/products/<slug>/originals/{main,front,side,back,detail}.jpg
+# 1. save the two photographs as:
+#      public/images/products/taiwan/originals/main.jpg    (green cap)
+#      public/images/products/al-adou/originals/main.jpg   (burgundy cap)
 npm install --no-save sharp
 node scripts/optimize-images.mjs
-# 2. set placeholder: false on those entries in src/lib/catalog/products.ts
+# 2. set PHOTO_READY = true in src/lib/catalog/products.ts
 ```
+
+Only the `main` view exists. Front, side and a close crop of the embroidery
+would each earn their place — one back-of-head shot does not show a customer
+the fit or the stitch. Adding one is an entry in the product's `images` array;
+the gallery grows a thumbnail strip on its own.
 
 The script writes AVIF and WebP at four widths plus a JPEG fallback, keeps the
 originals untouched as masters, and never crops — the embroidery is the
@@ -277,11 +288,12 @@ whose aspect ratio differs from the frame is letterboxed, not sliced.
 
 ## Current state
 
-The shop ships **closed**: both caps are seeded inactive with a price of zero
-and no stock, and every shipping fee is zero. That is deliberate — an inactive
-product cannot be read by the storefront, added to a cart or ordered, so there
-is no window in which a deploy could sell a cap for nothing. Opening it is a
-deliberate act, done from `/admin`.
+The shop ships **closed**. The price is real — 950.00 EGP, both caps, seeded
+as `95000` piastres — but stock is zero, both caps are inactive, and every
+shipping fee is zero, because none of those have been supplied. An inactive
+product with no stock cannot be read by the storefront, added to a cart or
+ordered, so there is no window in which a deploy could sell a cap it does not
+have. Opening it is a deliberate act, done from `/admin`.
 
 Live payment is **not** verified. The Paymob integration is complete and
 tested against its own test suite, but no real transaction has been put

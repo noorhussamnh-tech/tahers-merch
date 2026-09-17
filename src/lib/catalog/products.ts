@@ -75,6 +75,14 @@ export interface ProductContent {
   readonly fullPhrase?: string;
   /** One sentence. Appears beside the buy controls. */
   readonly description: string;
+  /**
+   * The cap's colour and thread colour, in Arabic.
+   *
+   * Recorded because the brief forbids altering either: if a reorder or a new
+   * photograph does not match what is written here, one of the two is wrong
+   * and somebody should notice rather than quietly ship a different cap.
+   */
+  readonly colour: string;
   readonly images: readonly ProductImage[];
 }
 
@@ -85,11 +93,19 @@ export interface ProductContent {
  */
 export const IMAGE_WIDTHS = [480, 768, 1200, 1800] as const;
 
-function placeholderImage(
+/**
+ * Builds an image entry.
+ *
+ * `ready` is what tells the gallery whether the file is actually on disk. Left
+ * false, a "photo pending" panel renders instead of a broken image -- which is
+ * the honest failure, and the one nobody ships by accident.
+ */
+function photo(
   slug: ProductSlug,
   view: ImageView,
   alt: string,
   size: { width: number; height: number },
+  ready: boolean,
 ): ProductImage {
   return {
     id: `${slug}-${view}`,
@@ -98,16 +114,32 @@ function placeholderImage(
     alt,
     width: size.width,
     height: size.height,
-    placeholder: true,
+    placeholder: !ready,
   };
 }
 
-/* Square for the catalogue views, 4:5 for the detail crop. */
+/**
+ * Both supplied photographs are square or very close to it, so the gallery
+ * reserves a square box and the editorial layout does not jump as the files
+ * arrive. Correct these to the real intrinsic size if a future photograph is
+ * shot in a different shape.
+ */
 const SQUARE = { width: 1600, height: 1600 };
-const PORTRAIT = { width: 1600, height: 2000 };
+
+/**
+ * Flip to true once the files are actually in public/images/products/, i.e.
+ * after dropping the originals in and running scripts/optimize-images.mjs.
+ *
+ * It is a single switch rather than a flag per image because both products
+ * are in the same state: one photograph supplied, not yet committed.
+ */
+const PHOTO_READY = false;
 
 /**
  * PRODUCT ONE -- تايوان يا ريس
+ *
+ * Supplied photography: the cap worn, shot from behind against the sea. Green
+ * cotton, the phrase embroidered in white across the back on a single line.
  *
  * Hierarchy, in the order the brief sets it: the product name, then the
  * question, then the waiting line, then -- small, once -- the aside.
@@ -119,19 +151,32 @@ const TAIWAN: ProductContent = {
   secondaryPhrase: "لأجل مصيف أفضل سأنتظر.",
   accentPhrase: "اغضب يا شي جين بينج.",
   description: "كاب مطرّز بعبارة «تايوان يا ريس».",
+  colour: "أخضر بتطريز أبيض",
   images: [
-    placeholderImage("taiwan", "main", "كاب «تايوان يا ريس» من الأمام", SQUARE),
-    placeholderImage("taiwan", "front", "واجهة الكاب والتطريز كاملًا", SQUARE),
-    placeholderImage("taiwan", "side", "الكاب من الجانب", SQUARE),
-    placeholderImage("taiwan", "back", "الكاب من الخلف مع فتحة المقاس", SQUARE),
-    placeholderImage("taiwan", "detail", "تفصيلة قريبة لتطريز العبارة", PORTRAIT),
+    // One photograph supplied so far. Further views -- front, side, a close
+    // crop of the embroidery -- go in this array as they are shot, and the
+    // gallery grows its thumbnail strip on its own once there is more than one.
+    photo(
+      "taiwan",
+      "main",
+      "شخص يرتدي كاب «تايوان يا ريس» الأخضر، مصوَّرًا من الخلف أمام البحر، والعبارة مطرّزة بالأبيض على ظهر الكاب.",
+      SQUARE,
+      PHOTO_READY,
+    ),
   ],
 };
 
 /**
  * PRODUCT TWO -- العدو ليس بهذه القوة
  *
- * The complete sentence appears once, under the two lines, and nowhere else.
+ * Supplied photography: the cap worn, shot from behind against the sea.
+ * Burgundy cotton with cream thread.
+ *
+ * Note that this cap carries BOTH lines of the phrase, stacked, on the back --
+ * which is why `fullPhrase` is not merely a page-layout choice here but an
+ * accurate description of the object.
+ *
+ * The complete sentence appears once on the page, under the two lines.
  */
 const AL_ADOU: ProductContent = {
   slug: "al-adou",
@@ -140,12 +185,15 @@ const AL_ADOU: ProductContent = {
   secondaryPhrase: "ونحن لسنا بهذا الضعف.",
   fullPhrase: "العدو ليس بهذه القوة، ونحن لسنا بهذا الضعف.",
   description: "كاب مطرّز بإحدى أشهر عبارات طاهر.",
+  colour: "نبيتي بتطريز لون الكريم",
   images: [
-    placeholderImage("al-adou", "main", "كاب «العدو ليس بهذه القوة» من الأمام", SQUARE),
-    placeholderImage("al-adou", "front", "واجهة الكاب والتطريز كاملًا", SQUARE),
-    placeholderImage("al-adou", "side", "الكاب من الجانب", SQUARE),
-    placeholderImage("al-adou", "back", "الكاب من الخلف مع فتحة المقاس", SQUARE),
-    placeholderImage("al-adou", "detail", "تفصيلة قريبة لتطريز العبارة", PORTRAIT),
+    photo(
+      "al-adou",
+      "main",
+      "شخص يرتدي كاب «العدو ليس بهذه القوة» النبيتي، مصوَّرًا من الخلف أمام البحر، والعبارة مطرّزة على سطرين.",
+      SQUARE,
+      PHOTO_READY,
+    ),
   ],
 };
 

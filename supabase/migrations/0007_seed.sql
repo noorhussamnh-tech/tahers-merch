@@ -1,46 +1,48 @@
--- Seed: the two caps, their five photographs each, and every Egyptian
+-- Seed: the two caps, the photograph supplied for each, and every Egyptian
 -- governorate as a shipping destination.
 --
 -- IMPORTANT -- this seed deliberately ships the store CLOSED.
 --
--- Both products are created with `active = false`, a price of 0 and no stock,
--- and every shipping zone is created with a fee of 0. None of those are real
--- numbers, because the business has not supplied them (see
--- docs/MISSING-INFORMATION.md). An inactive product cannot be read by the
--- storefront, cannot be added to a cart and cannot be ordered, so there is no
--- window in which a deploy could sell a cap for nothing.
+-- The PRICE is real: 950.00 EGP, supplied by the business, stored as 95000
+-- piastres. Everything else that would let a cap actually sell is not:
+-- `stock_quantity` is 0, `active` is false, and every shipping zone has a fee
+-- of 0, because none of those have been supplied (see
+-- docs/MISSING-INFORMATION.md).
 --
--- Opening the store is a deliberate act: set the price and stock, then
--- activate, from /admin or with the statements at the bottom of this file.
+-- An inactive product with no stock cannot be read by the storefront, added
+-- to a cart or ordered, so there is no window in which a deploy could sell a
+-- cap it does not have.
+--
+-- Opening the store is a deliberate act: set the stock and the shipping fees,
+-- then activate, from /admin or with the statements at the bottom of this
+-- file.
 
+-- 95000 piastres = 950.00 EGP. Both caps are the same price.
 insert into tc_products (slug, name_ar, description_ar, price_piastres, stock_quantity, active, display_order)
 values
-  ('taiwan',  'تايوان يا ريس',        'كاب مطرّز بعبارة «تايوان يا ريس».',      0, 0, false, 1),
-  ('al-adou', 'العدو ليس بهذه القوة', 'كاب مطرّز بإحدى أشهر عبارات طاهر.',     0, 0, false, 2)
+  ('taiwan',  'تايوان يا ريس',        'كاب مطرّز بعبارة «تايوان يا ريس».',  95000, 0, false, 1),
+  ('al-adou', 'العدو ليس بهذه القوة', 'كاب مطرّز بإحدى أشهر عبارات طاهر.', 95000, 0, false, 2)
 on conflict (slug) do nothing;
 
--- Photography. `base_path` is the stem; the optimiser writes the AVIF and
--- WebP variants beside it and the gallery builds its srcset from that. The
--- alt text is Arabic and describes the photograph, not the product name.
+-- Photography.
+--
+-- One photograph per cap has been supplied: the cap worn, shot from behind
+-- against the sea. `base_path` is the stem; the optimiser writes the AVIF and
+-- WebP variants beside it and the gallery builds its srcset from that.
+--
+-- Only the `main` view is seeded, because only the `main` view exists. Add a
+-- row here as each further view is shot -- the gallery reads whatever is in
+-- src/lib/catalog/products.ts and grows a thumbnail strip on its own.
 insert into tc_product_images (product_id, view, base_path, alt_ar, width, height, display_order)
-select p.id, v.view, '/images/products/' || p.slug || '/' || v.view, v.alt, v.w, v.h, v.ord
+select p.id, 'main', '/images/products/' || p.slug || '/main', v.alt, 1600, 1600, 1
   from tc_products p
-  cross join (values
-    ('main',   'صورة الكاب الأساسية',              1600, 1600, 1),
-    ('front',  'واجهة الكاب والتطريز كاملًا',       1600, 1600, 2),
-    ('side',   'الكاب من الجانب',                  1600, 1600, 3),
-    ('back',   'الكاب من الخلف مع فتحة المقاس',     1600, 1600, 4),
-    ('detail', 'تفصيلة قريبة لتطريز العبارة',       1600, 2000, 5)
-  ) as v(view, alt, w, h, ord)
- where p.slug in ('taiwan', 'al-adou')
+  join (values
+    ('taiwan',
+     'شخص يرتدي كاب «تايوان يا ريس» الأخضر، مصوَّرًا من الخلف أمام البحر، والعبارة مطرّزة بالأبيض على ظهر الكاب.'),
+    ('al-adou',
+     'شخص يرتدي كاب «العدو ليس بهذه القوة» النبيتي، مصوَّرًا من الخلف أمام البحر، والعبارة مطرّزة على سطرين.')
+  ) as v(slug, alt) on v.slug = p.slug
 on conflict (product_id, view) do nothing;
-
--- Per-product alt text for the two views where naming the cap helps a screen
--- reader tell the products apart in a list.
-update tc_product_images i
-   set alt_ar = 'كاب «' || p.name_ar || '» من الأمام'
-  from tc_products p
- where i.product_id = p.id and i.view = 'main';
 
 -- All 27 governorates. A destination with no row cannot be quoted, so every
 -- one is present from the start; the FEE is what remains to be filled in.
@@ -80,8 +82,7 @@ on conflict (governorate) do nothing;
 -- same thing from /admin, which is what it is for.
 --
 --   update tc_products
---      set price_piastres = 75000,   -- 750.00 EGP, in piastres
---          stock_quantity = 100,
+--      set stock_quantity = 100,     -- the count the manufacturer delivered
 --          active = true
 --    where slug = 'taiwan';
 --

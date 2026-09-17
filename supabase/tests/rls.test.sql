@@ -51,7 +51,10 @@ begin
   perform assert((select count(*) from tc_products where slug = 'al-adou') = 0,
                  'an inactive product is invisible, not merely unbuyable');
   perform assert((select count(*) from tc_shipping_zones) = 27, 'anon can read shipping fees');
-  perform assert((select count(*) from tc_product_images) = 5,
+  -- One photograph per cap has been supplied, and only the active cap's is
+  -- visible. The number is the count of supplied views, not a fixed five:
+  -- add a view and this assertion is where you are reminded to update it.
+  perform assert((select count(*) from tc_product_images) = 1,
                  'anon sees photographs for the active product only');
 
   -- Settings: only the rows marked public.
