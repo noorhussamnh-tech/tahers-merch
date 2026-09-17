@@ -41,8 +41,21 @@ interface ProductImageProps {
   readonly compact?: boolean;
 }
 
-function srcSet(basePath: string, extension: string): string {
-  return IMAGE_WIDTHS.map((width) => `${basePath}-${width}.${extension} ${width}w`).join(", ");
+/**
+ * The srcset, limited to variants that exist on disk.
+ *
+ * The optimiser never upscales: a 1024px original produces no 1200px or
+ * 1800px variant. Offering those anyway makes the browser request a file that
+ * 404s and render a broken image -- which is exactly what happened the first
+ * time a real photograph went in. So the list is filtered by the original's
+ * own width, keeping the smallest entry regardless so there is always at
+ * least one candidate.
+ */
+function srcSet(basePath: string, extension: string, intrinsicWidth: number): string {
+  const [smallest] = IMAGE_WIDTHS;
+  return IMAGE_WIDTHS.filter((width) => width <= intrinsicWidth || width === smallest)
+    .map((width) => `${basePath}-${width}.${extension} ${width}w`)
+    .join(", ");
 }
 
 export function ProductImage({
@@ -58,8 +71,16 @@ export function ProductImage({
 
   return (
     <picture>
-      <source type="image/avif" srcSet={srcSet(image.basePath, "avif")} sizes={sizes} />
-      <source type="image/webp" srcSet={srcSet(image.basePath, "webp")} sizes={sizes} />
+      <source
+        type="image/avif"
+        srcSet={srcSet(image.basePath, "avif", image.width)}
+        sizes={sizes}
+      />
+      <source
+        type="image/webp"
+        srcSet={srcSet(image.basePath, "webp", image.width)}
+        sizes={sizes}
+      />
       <img
         src={`${image.basePath}.jpg`}
         alt={image.alt}
@@ -99,8 +120,8 @@ function PlaceholderPanel({
   return (
     <div
       className={cn(
-        "flex h-full w-full flex-col items-center justify-center gap-2 overflow-hidden bg-paper",
-        "border border-dashed border-line text-center",
+        "flex h-full w-full flex-col items-center justify-center gap-2 overflow-hidden bg-card",
+        "border border-dashed border-border text-center",
         compact ? "px-1" : "gap-3 px-6",
         className,
       )}

@@ -203,7 +203,7 @@ function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-page px-5 py-12 md:px-10 md:py-16 lg:px-16">
-      <h1 className="font-display text-headline text-ink">Checkout</h1>
+      <h1 className="font-display text-headline text-foreground">Checkout</h1>
 
       <form
         onSubmit={handleSubmit}
@@ -358,26 +358,29 @@ function CheckoutPage() {
 
         {/* ------------------------------------------------- order summary */}
         <aside className="lg:sticky lg:top-32 lg:h-fit">
-          <div className="border border-line bg-paper p-6">
-            <h2 className="control text-ink">Order summary</h2>
+          <div className="border border-border bg-card p-6">
+            <h2 className="control text-foreground">Order summary</h2>
 
-            <ul className="mt-6 flex flex-col gap-4 border-b border-line pb-6">
+            <ul className="mt-6 flex flex-col gap-4 border-b border-border pb-6">
               {lines.map(({ line, product }) => (
                 <li key={line.slug} className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <span dir="rtl" className="block font-arabic text-sm leading-snug text-ink">
+                    <span
+                      dir="rtl"
+                      className="block font-arabic text-sm leading-snug text-foreground"
+                    >
                       {productContent(line.slug).name}
                     </span>
                     <span className="font-sans text-xs text-muted">× {line.quantity}</span>
                   </div>
-                  <span className="shrink-0 font-sans text-sm text-ink">
+                  <span className="shrink-0 font-sans text-sm text-foreground">
                     {formatEGP(product.price * line.quantity)}
                   </span>
                 </li>
               ))}
             </ul>
 
-            <div className="flex gap-2 border-b border-line py-5">
+            <div className="flex gap-2 border-b border-border py-5">
               <input
                 aria-label="Discount code"
                 placeholder="Discount code"
@@ -399,7 +402,7 @@ function CheckoutPage() {
               </Button>
             </div>
 
-            <dl className="flex flex-col gap-3 border-b border-line py-5 font-sans text-sm">
+            <dl className="flex flex-col gap-3 border-b border-border py-5 font-sans text-sm">
               <Row label="Subtotal" value={quote ? formatEGP(quote.subtotal) : "—"} />
 
               {quote && quote.discount > 0 && (
@@ -419,8 +422,8 @@ function CheckoutPage() {
             </dl>
 
             <div className="flex items-baseline justify-between py-5 font-sans">
-              <span className="text-xs uppercase tracking-[0.14em] text-ink">Total</span>
-              <span className="text-lg text-ink">
+              <span className="text-xs uppercase tracking-[0.14em] text-foreground">Total</span>
+              <span className="text-lg text-foreground">
                 {quote?.total != null ? formatEGP(quote.total) : "—"}
               </span>
             </div>
@@ -439,7 +442,7 @@ function CheckoutPage() {
               </p>
             )}
 
-            <label className="flex cursor-pointer items-start gap-3 border-t border-line pt-5">
+            <label className="flex cursor-pointer items-start gap-3 border-t border-border pt-5">
               <input
                 type="checkbox"
                 checked={acceptedTerms}
@@ -479,7 +482,7 @@ function Row({ label, value, accent }: { label: string; value: string; accent?: 
   return (
     <div className="flex items-center justify-between gap-4">
       <dt className="text-muted">{label}</dt>
-      <dd className={accent ? "text-accent" : "text-ink"}>{value}</dd>
+      <dd className={accent ? "text-signal" : "text-foreground"}>{value}</dd>
     </div>
   );
 }
@@ -487,7 +490,7 @@ function Row({ label, value, accent }: { label: string; value: string; accent?: 
 function Fieldset({ legend, children }: { legend: string; children: React.ReactNode }) {
   return (
     <fieldset className="flex flex-col gap-5">
-      <legend className="control mb-1 text-ink">{legend}</legend>
+      <legend className="control mb-1 text-foreground">{legend}</legend>
       {children}
     </fieldset>
   );
@@ -510,7 +513,7 @@ function Field({
     <div className="flex flex-col gap-1.5">
       <label htmlFor={name} className="font-sans text-xs text-muted">
         {label}
-        {required && <span className="text-accent"> *</span>}
+        {required && <span className="text-signal"> *</span>}
       </label>
       {children}
       {error && (
@@ -524,10 +527,10 @@ function Field({
 
 function inputClass(error: string | undefined): string {
   return cn(
-    "h-12 w-full border bg-cream px-3 font-sans text-sm text-ink",
+    "h-12 w-full border bg-background px-3 font-sans text-sm text-foreground",
     "outline-none transition-colors placeholder:text-muted/60",
-    "focus:border-accent",
-    error ? "border-error" : "border-line",
+    "focus:border-signal",
+    error ? "border-error" : "border-border",
   );
 }
 
@@ -551,7 +554,7 @@ function PaymentOption({
     <label
       className={cn(
         "flex cursor-pointer items-start gap-3 border p-4 transition-colors",
-        selected ? "border-accent bg-paper" : "border-line",
+        selected ? "border-signal bg-card" : "border-border",
         disabled && "cursor-not-allowed opacity-50",
       )}
     >
@@ -565,7 +568,7 @@ function PaymentOption({
         className="mt-1 h-4 w-4 shrink-0 accent-[#7D252A]"
       />
       <span className="flex flex-col gap-1">
-        <span className="font-sans text-sm text-ink">{title}</span>
+        <span className="font-sans text-sm text-foreground">{title}</span>
         <span className="font-sans text-xs leading-relaxed text-muted">{note}</span>
       </span>
     </label>
@@ -575,8 +578,8 @@ function PaymentOption({
 function EmptyCheckout() {
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-page flex-col items-center justify-center gap-8 px-5 text-center">
-      <p className="font-display text-headline text-ink">{CART_EMPTY.heading}</p>
-      <Link to="/" hash="shop" className="control text-accent underline underline-offset-4">
+      <p className="font-display text-headline text-foreground">{CART_EMPTY.heading}</p>
+      <Link to="/" hash="shop" className="control text-signal underline underline-offset-4">
         {CART_EMPTY.action}
       </Link>
     </div>

@@ -24,7 +24,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#F4EFE6" },
+      { name: "theme-color", content: "#F5F0E6" },
       // The default title and description are Arabic: the shop's audience
       // reads Arabic, and this is what a share card shows.
       { title: "كابات طاهر | Taher Caps" },
@@ -51,10 +51,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        // Three families, only the weights actually used, `display=swap` so
-        // the Arabic renders in a fallback rather than not at all while the
-        // serif loads.
-        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Noto+Serif+Arabic:wght@400;500;600&display=swap",
+        // The four families the design uses, only the weights actually used.
+        // `display=swap` so the Arabic renders in a fallback rather than not
+        // at all while the serif loads.
+        href: "https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Manrope:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap",
       },
     ],
   }),
@@ -74,11 +74,11 @@ function RootDocument() {
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-screen bg-cream font-sans text-ink antialiased">
+      <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <CartProvider>
           <a
             href="#main"
-            className="sr-only-focusable focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-accent focus:px-4 focus:py-2 focus:text-paper"
+            className="sr-only-focusable focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-signal focus:px-4 focus:py-2 focus:text-signal-foreground"
           >
             Skip to content
           </a>
@@ -94,11 +94,11 @@ function RootDocument() {
           position="bottom-center"
           toastOptions={{
             style: {
-              background: "#FFFDF8",
-              color: "#17130F",
-              border: "1px solid #CFC6B9",
-              borderRadius: "0",
-              fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+              background: "oklch(0.985 0.006 83)",
+              color: "oklch(0.18 0.01 65)",
+              border: "1px solid oklch(0.79 0.018 75)",
+              borderRadius: "0.25rem",
+              fontFamily: "Manrope, sans-serif",
             },
           }}
         />

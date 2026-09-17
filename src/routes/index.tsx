@@ -79,7 +79,7 @@ function HomePage() {
  */
 function SetupNotice() {
   return (
-    <div className="fixed bottom-4 left-4 z-30 max-w-sm border border-line bg-paper p-4">
+    <div className="fixed bottom-4 left-4 z-30 max-w-sm border border-border bg-card p-4">
       <p className="eyebrow">Setup</p>
       <p className="mt-2 font-sans text-sm text-muted">
         Supabase is not configured, so prices and stock cannot be loaded. Set VITE_SUPABASE_URL and

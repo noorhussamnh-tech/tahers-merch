@@ -67,7 +67,7 @@ function ProductPage() {
         <Link
           to="/"
           hash="shop"
-          className="control text-muted underline underline-offset-4 transition-colors hover:text-accent"
+          className="control text-muted underline underline-offset-4 transition-colors hover:text-signal"
         >
           {UI.continueShopping}
         </Link>
@@ -88,10 +88,10 @@ function ProductPage() {
 function NotFound() {
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-page flex-col items-center justify-center gap-8 px-5 text-center">
-      <p dir="rtl" className="phrase text-headline text-ink">
+      <p dir="rtl" className="phrase text-headline text-foreground">
         هذا التصميم غير موجود.
       </p>
-      <Link to="/" hash="shop" className="control text-accent underline underline-offset-4">
+      <Link to="/" hash="shop" className="control text-signal underline underline-offset-4">
         {UI.continueShopping}
       </Link>
     </div>

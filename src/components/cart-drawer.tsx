@@ -55,18 +55,18 @@ export function CartDrawer({ products }: { products: readonly Product[] }) {
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Cart">
       <button
         type="button"
-        className="absolute inset-0 bg-ink/25"
+        className="absolute inset-0 bg-foreground/25"
         onClick={cart.close}
         aria-label="Close cart"
       />
 
-      <aside className="absolute inset-y-0 right-0 flex w-full flex-col bg-cream sm:max-w-md sm:border-l sm:border-line">
-        <header className="flex items-center justify-between border-b border-line px-6 py-5">
-          <h2 className="control text-ink">{UI.cart}</h2>
+      <aside className="absolute inset-y-0 right-0 flex w-full flex-col bg-background sm:max-w-md sm:border-l sm:border-border">
+        <header className="flex items-center justify-between border-b border-border px-6 py-5">
+          <h2 className="control text-foreground">{UI.cart}</h2>
           <button
             type="button"
             onClick={cart.close}
-            className="flex h-10 w-10 items-center justify-center text-ink transition-colors hover:text-accent"
+            className="flex h-10 w-10 items-center justify-center text-foreground transition-colors hover:text-signal"
             aria-label="Close cart"
           >
             <X className="h-5 w-5" strokeWidth={1.5} aria-hidden />
@@ -79,8 +79,8 @@ export function CartDrawer({ products }: { products: readonly Product[] }) {
           <>
             <ul className="flex-1 overflow-y-auto px-6">
               {priced.map(({ line, product, total }) => (
-                <li key={line.slug} className="flex gap-4 border-b border-line py-6">
-                  <div className="w-20 shrink-0 overflow-hidden bg-paper">
+                <li key={line.slug} className="flex gap-4 border-b border-border py-6">
+                  <div className="w-20 shrink-0 overflow-hidden bg-card">
                     <ProductImage
                       image={mainImage(line.slug)}
                       sizes="80px"
@@ -90,10 +90,12 @@ export function CartDrawer({ products }: { products: readonly Product[] }) {
                   </div>
 
                   <div className="flex min-w-0 flex-1 flex-col gap-2">
-                    <div dir="rtl" className="font-arabic text-base leading-snug text-ink">
+                    <div dir="rtl" className="font-arabic text-base leading-snug text-foreground">
                       {productContent(line.slug).name}
                     </div>
-                    <div className="font-sans text-sm text-muted">{formatEGP(product.price)}</div>
+                    <div className="font-mono text-xs tracking-[0.1em] text-muted">
+                      {formatEGP(product.price)}
+                    </div>
 
                     <div className="mt-auto flex items-center justify-between gap-3">
                       <QuantityStepper
@@ -105,20 +107,22 @@ export function CartDrawer({ products }: { products: readonly Product[] }) {
                       <button
                         type="button"
                         onClick={() => cart.remove(line.slug)}
-                        className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted underline underline-offset-4 transition-colors hover:text-accent"
+                        className="font-sans text-[11px] uppercase tracking-[0.14em] text-muted underline underline-offset-4 transition-colors hover:text-signal"
                       >
                         {UI.remove}
                       </button>
                     </div>
                   </div>
 
-                  <div className="shrink-0 font-sans text-sm text-ink">{formatEGP(total)}</div>
+                  <div className="shrink-0 font-mono text-xs tracking-[0.1em]">
+                    {formatEGP(total)}
+                  </div>
                 </li>
               ))}
             </ul>
 
-            <footer className="border-t border-line px-6 py-6">
-              <div className="flex items-center justify-between font-sans text-sm text-ink">
+            <footer className="border-t border-border px-6 py-6">
+              <div className="flex items-center justify-between font-sans text-sm text-foreground">
                 <span className="uppercase tracking-[0.14em]">Subtotal</span>
                 <span>{formatEGP(subtotal)}</span>
               </div>
@@ -137,7 +141,7 @@ export function CartDrawer({ products }: { products: readonly Product[] }) {
               <button
                 type="button"
                 onClick={cart.close}
-                className="mt-4 w-full font-sans text-[11px] uppercase tracking-[0.14em] text-muted underline underline-offset-4 transition-colors hover:text-accent"
+                className="mt-4 w-full font-sans text-[11px] uppercase tracking-[0.14em] text-muted underline underline-offset-4 transition-colors hover:text-signal"
               >
                 {UI.continueShopping}
               </button>
@@ -152,7 +156,7 @@ export function CartDrawer({ products }: { products: readonly Product[] }) {
 function EmptyCart({ onContinue }: { onContinue: () => void }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-8 px-8 text-center">
-      <p className="font-display text-3xl text-ink">{CART_EMPTY.heading}</p>
+      <p className="font-display text-3xl text-foreground">{CART_EMPTY.heading}</p>
       <Button variant="outline" onClick={onContinue}>
         {CART_EMPTY.action}
       </Button>
@@ -172,17 +176,17 @@ export function QuantityStepper({
   label: string;
 }) {
   return (
-    <div className="flex items-center border border-line [direction:ltr]">
+    <div className="flex items-center border border-border [direction:ltr]">
       <button
         type="button"
         onClick={() => onChange(value - 1)}
-        className="flex h-9 w-9 items-center justify-center text-ink transition-colors hover:text-accent disabled:opacity-30"
+        className="flex h-9 w-9 items-center justify-center text-foreground transition-colors hover:text-signal disabled:opacity-30"
         aria-label={`Decrease quantity of ${label}`}
       >
         <Minus className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
       </button>
       <span
-        className="w-8 text-center font-sans text-sm text-ink"
+        className="w-8 text-center font-sans text-sm text-foreground"
         aria-live="polite"
         aria-label={`Quantity of ${label}`}
       >
@@ -192,7 +196,7 @@ export function QuantityStepper({
         type="button"
         onClick={() => onChange(value + 1)}
         disabled={value >= max}
-        className="flex h-9 w-9 items-center justify-center text-ink transition-colors hover:text-accent disabled:opacity-30"
+        className="flex h-9 w-9 items-center justify-center text-foreground transition-colors hover:text-signal disabled:opacity-30"
         aria-label={`Increase quantity of ${label}`}
       >
         <Plus className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />

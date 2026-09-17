@@ -62,7 +62,7 @@ export function ProductGallery({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="group relative overflow-hidden bg-paper">
+      <div className="group relative overflow-hidden bg-card">
         <button
           type="button"
           onClick={() => setZoomed(true)}
@@ -83,7 +83,7 @@ export function ProductGallery({
         </button>
 
         <span
-          className="pointer-events-none absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center bg-cream/90 text-ink opacity-0 transition-opacity group-hover:opacity-100"
+          className="pointer-events-none absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center bg-background/90 text-foreground opacity-0 transition-opacity group-hover:opacity-100"
           aria-hidden
         >
           <ZoomIn className="h-4 w-4" strokeWidth={1.5} />
@@ -100,8 +100,10 @@ export function ProductGallery({
                 aria-label={VIEW_LABEL[image.view]}
                 aria-current={image.id === selected.id}
                 className={cn(
-                  "block w-full overflow-hidden border bg-paper transition-colors",
-                  image.id === selected.id ? "border-accent" : "border-line hover:border-ink",
+                  "block w-full overflow-hidden border bg-card transition-colors",
+                  image.id === selected.id
+                    ? "border-signal"
+                    : "border-border hover:border-foreground",
                 )}
               >
                 <div className="flex aspect-square items-center justify-center">
@@ -126,7 +128,7 @@ export function ProductGallery({
 function ZoomOverlay({ image, onClose }: { image: ProductImageData; onClose: () => void }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-cream/98 p-4 md:p-12"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/98 p-4 md:p-12"
       role="dialog"
       aria-modal="true"
       aria-label={image.alt}
@@ -140,7 +142,7 @@ function ZoomOverlay({ image, onClose }: { image: ProductImageData; onClose: () 
       <button
         type="button"
         onClick={onClose}
-        className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center border border-line bg-cream text-ink transition-colors hover:text-accent md:right-8 md:top-8"
+        className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center border border-border bg-background text-foreground transition-colors hover:text-signal md:right-8 md:top-8"
         aria-label="Close"
       >
         <X className="h-5 w-5" strokeWidth={1.5} aria-hidden />

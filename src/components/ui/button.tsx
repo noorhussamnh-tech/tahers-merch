@@ -18,8 +18,10 @@ import { cn } from "@/lib/utils";
 
 const button = cva(
   [
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap",
-    "font-sans text-xs uppercase tracking-[0.14em]",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm",
+    // Mono, letterspaced hard: the design's signature, and what keeps a button
+    // reading as a control rather than as prose.
+    "font-mono text-[11px] uppercase tracking-[0.2em]",
     "transition-colors duration-150",
     "disabled:pointer-events-none disabled:opacity-40",
     // Controls read left to right whatever section they sit in.
@@ -28,12 +30,15 @@ const button = cva(
   {
     variants: {
       variant: {
-        // The accent, used for the action we want taken.
-        primary: "bg-accent text-paper hover:bg-ink",
-        // A hairline box: present, but quieter than the accent.
-        outline: "border border-ink text-ink hover:bg-ink hover:text-paper",
-        // Text only, for destructive or incidental actions.
-        ghost: "text-muted underline underline-offset-4 hover:text-accent",
+        // Ink by default, the way the source design has its primary button.
+        primary: "bg-foreground text-background hover:bg-signal",
+        // A hairline box: present, but quieter.
+        outline:
+          "border border-border hover:border-foreground hover:bg-foreground hover:text-background",
+        // Text only, for incidental actions.
+        ghost: "text-muted underline underline-offset-4 hover:text-signal",
+        // The one loud button, for the action we most want taken.
+        signal: "bg-signal text-signal-foreground hover:bg-foreground",
       },
       size: {
         sm: "h-9 px-4",

@@ -50,34 +50,41 @@ function OrderPage() {
       <div className="mx-auto max-w-3xl px-5 py-16 md:px-10 md:py-24">
         <p className="eyebrow">Order confirmed</p>
 
-        <h1 className="mt-5 font-display text-headline text-ink">Your order has been confirmed.</h1>
+        <h1 className="mt-5 font-display text-headline text-foreground">
+          Your order has been confirmed.
+        </h1>
 
-        <div className="mt-10 border border-line bg-paper">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line px-6 py-5">
+        <div className="mt-10 border border-border bg-card">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-6 py-5">
             <div>
               <p className="eyebrow">Order number</p>
-              <p className="mt-1 font-sans text-lg tracking-wide text-ink">{status.orderNumber}</p>
+              <p className="mt-1 font-sans text-lg tracking-wide text-foreground">
+                {status.orderNumber}
+              </p>
             </div>
             <PaymentBadge method={status.paymentMethod} status={status.paymentStatus} />
           </div>
 
-          <ul className="flex flex-col gap-4 border-b border-line px-6 py-6">
+          <ul className="flex flex-col gap-4 border-b border-border px-6 py-6">
             {status.lines.map((line) => (
               <li key={line.slug} className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <span dir="rtl" className="block font-arabic text-base leading-snug text-ink">
+                  <span
+                    dir="rtl"
+                    className="block font-arabic text-base leading-snug text-foreground"
+                  >
                     {line.name}
                   </span>
                   <span className="font-sans text-xs text-muted">× {line.quantity}</span>
                 </div>
-                <span className="shrink-0 font-sans text-sm text-ink">
+                <span className="shrink-0 font-sans text-sm text-foreground">
                   {formatEGP(line.lineTotal)}
                 </span>
               </li>
             ))}
           </ul>
 
-          <dl className="flex flex-col gap-3 border-b border-line px-6 py-5 font-sans text-sm">
+          <dl className="flex flex-col gap-3 border-b border-border px-6 py-5 font-sans text-sm">
             <SummaryRow label="Subtotal" value={formatEGP(status.subtotal)} />
             {status.discount > 0 && (
               <SummaryRow label="Discount" value={`− ${formatEGP(status.discount)}`} />
@@ -86,14 +93,14 @@ function OrderPage() {
           </dl>
 
           <div className="flex items-baseline justify-between px-6 py-5">
-            <span className="control text-ink">Total</span>
-            <span className="font-sans text-xl text-ink">{formatEGP(status.total)}</span>
+            <span className="control text-foreground">Total</span>
+            <span className="font-sans text-xl text-foreground">{formatEGP(status.total)}</span>
           </div>
 
           {remembered && (
-            <div className="border-t border-line px-6 py-5">
+            <div className="border-t border-border px-6 py-5">
               <p className="eyebrow">Delivering to</p>
-              <p className="mt-2 font-sans text-sm leading-relaxed text-ink">
+              <p className="mt-2 font-sans text-sm leading-relaxed text-foreground">
                 {remembered.customerName}
                 <br />
                 {remembered.address.street}, Building {remembered.address.building}, Floor{" "}
@@ -114,7 +121,7 @@ function OrderPage() {
           <Link
             to="/"
             hash="shop"
-            className="control text-muted underline underline-offset-4 transition-colors hover:text-accent"
+            className="control text-muted underline underline-offset-4 transition-colors hover:text-signal"
           >
             {UI.continueShopping}
           </Link>
@@ -135,7 +142,7 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4">
       <dt className="text-muted">{label}</dt>
-      <dd className="text-ink">{value}</dd>
+      <dd className="text-foreground">{value}</dd>
     </div>
   );
 }
@@ -161,9 +168,9 @@ function PaymentBadge({
       className={cn(
         "border px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.14em]",
         status === "paid" && "border-success text-success",
-        status === "pending" && "border-line text-muted",
+        status === "pending" && "border-border text-muted",
         (status === "failed" || status === "cancelled") && "border-error text-error",
-        status === "refunded" && "border-line text-muted",
+        status === "refunded" && "border-border text-muted",
       )}
     >
       {label}
@@ -214,8 +221,8 @@ function PaymentGuidance({
 
   if (status === "pending") {
     return (
-      <div className="mt-8 border border-line bg-paper p-5">
-        <p dir="rtl" className="font-arabic text-base leading-loose text-ink">
+      <div className="mt-8 border border-border bg-card p-5">
+        <p dir="rtl" className="font-arabic text-base leading-loose text-foreground">
           لم يصلنا تأكيد الدفع بعد.
         </p>
         <p className="mt-2 font-sans text-xs leading-relaxed text-muted">
@@ -227,7 +234,7 @@ function PaymentGuidance({
   }
 
   return (
-    <div className="mt-8 border border-error/40 bg-paper p-5">
+    <div className="mt-8 border border-error/40 bg-card p-5">
       <p dir="rtl" className="font-arabic text-base leading-loose text-error">
         لم يتم الدفع.
       </p>
@@ -247,7 +254,7 @@ function PaymentGuidance({
 function UnknownOrder() {
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-page flex-col items-center justify-center gap-8 px-5 text-center">
-      <p className="font-display text-headline text-ink">We could not find that order.</p>
+      <p className="font-display text-headline text-foreground">We could not find that order.</p>
       <p className="font-sans text-sm text-muted">
         Check the order number, or look it up with your mobile number.
       </p>

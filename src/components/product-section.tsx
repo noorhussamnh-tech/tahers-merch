@@ -56,11 +56,16 @@ export function ProductSection({
   return (
     <section
       id={slug}
-      className="scroll-mt-28 border-t border-line"
+      className="scroll-mt-28 border-t border-border"
       aria-labelledby={`${slug}-name`}
     >
-      <div className="mx-auto grid max-w-page grid-cols-1 items-start gap-10 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-16 lg:px-16">
-        <div className={cn("order-1", imageFirst ? "lg:order-1" : "lg:order-2")}>
+      <div className="mx-auto grid max-w-page grid-cols-1 items-start gap-8 px-5 py-14 sm:px-8 lg:grid-cols-2 lg:gap-14 lg:py-20">
+        <div className={cn("relative order-1", imageFirst ? "lg:order-1" : "lg:order-2")}>
+          {/* The colour chip the design puts in the corner of a product photo. */}
+          <span className="label-sm pointer-events-none absolute left-4 top-4 z-10 bg-background/90 px-2.5 py-1.5">
+            {slug === "taiwan" ? "Green" : "Burgundy"}
+          </span>
+
           <ProductGallery product={content} priority={priority} />
 
           {/* The aside lives here, attached to the photography, tiny, once.
@@ -76,30 +81,28 @@ export function ProductSection({
           className={cn("order-2 flex flex-col gap-7", imageFirst ? "lg:order-2" : "lg:order-1")}
         >
           <div dir="rtl" className="flex flex-col gap-5 text-right">
-            <h3 id={`${slug}-name`} className="phrase text-title font-normal text-ink">
+            <h3 id={`${slug}-name`} className="phrase font-arabic text-title font-semibold">
               {content.name}
             </h3>
 
-            <p className="phrase text-[1.75rem] leading-snug text-accent md:text-[2.125rem]">
+            <p className="phrase font-arabic text-[1.5rem] leading-[1.6] text-signal sm:text-[1.875rem]">
               {content.primaryPhrase}
             </p>
 
-            <p className="font-arabic text-lg leading-loose text-muted">
-              {content.secondaryPhrase}
-            </p>
+            <p className="font-arabic text-lg leading-8 text-muted">{content.secondaryPhrase}</p>
 
             {/* Product two only: the two lines written out together, once. */}
             {content.fullPhrase && (
-              <p className="border-t border-line pt-5 font-arabic text-base leading-loose text-ink">
+              <p className="border-t border-border pt-5 font-arabic text-base leading-8">
                 {content.fullPhrase}
               </p>
             )}
 
-            <p className="font-arabic text-base leading-loose text-muted">{content.description}</p>
+            <p className="font-arabic text-base leading-8 text-muted">{content.description}</p>
 
             {/* Colour and thread. A real product detail, kept small: it sits
                 with the description rather than competing with the phrase. */}
-            <p className="font-arabic text-sm leading-loose text-muted">اللون: {content.colour}</p>
+            <p className="font-arabic text-sm leading-7 text-muted">اللون: {content.colour}</p>
           </div>
 
           <BuyPanel slug={slug} product={product} name={content.name} sticky={sticky} />
@@ -133,7 +136,7 @@ function BuyPanel({
 
   if (!product) {
     return (
-      <div className="border-t border-line pt-7">
+      <div className="border-t border-border pt-6">
         <p dir="rtl" className="font-arabic text-base text-muted">
           هذا التصميم غير متاح حاليًا.
         </p>
@@ -154,9 +157,9 @@ function BuyPanel({
   };
 
   return (
-    <div className="flex flex-col gap-6 border-t border-line pt-7">
+    <div className="flex flex-col gap-6 border-t border-border pt-6">
       <div className="flex items-baseline justify-between gap-4">
-        <span className="font-sans text-xl text-ink">
+        <span className="font-mono text-base tracking-[0.12em]">
           {priceUnset ? "—" : formatEGP(product.price)}
         </span>
         <Availability available={product.available} soldOut={soldOut} />
@@ -178,9 +181,10 @@ function BuyPanel({
 
             <Button
               size="lg"
+              variant="signal"
               onClick={handleAdd}
               disabled={soldOut}
-              className="flex-1 min-w-[12rem]"
+              className="min-w-[12rem] flex-1"
             >
               {soldOut ? UI.soldOut : added ? "Added" : UI.addToCart}
             </Button>
@@ -189,8 +193,8 @@ function BuyPanel({
           {/* The sticky bar a phone gets on the product detail view, so the
               action stays reachable while scrolling a long section. */}
           {sticky && !soldOut && (
-            <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream px-5 py-3 lg:hidden">
-              <Button size="lg" onClick={handleAdd} className="w-full">
+            <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background px-5 py-3 lg:hidden">
+              <Button size="lg" variant="signal" onClick={handleAdd} className="w-full">
                 {added ? "Added" : `${UI.addToCart} — ${formatEGP(product.price * quantity)}`}
               </Button>
             </div>
@@ -214,7 +218,7 @@ function Availability({ available, soldOut }: { available: number; soldOut: bool
   // that it is just a stock figure the shop has no reason to publish.
   if (available <= 5) {
     return (
-      <span dir="rtl" className="font-arabic text-sm text-accent">
+      <span dir="rtl" className="font-arabic text-sm text-signal">
         {available === 1 ? "بقيت قطعة واحدة." : `بقي ${available} قطع فقط.`}
       </span>
     );

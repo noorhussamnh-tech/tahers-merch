@@ -1,12 +1,16 @@
 /**
  * The header.
  *
- * Logo left, navigation centred, cart right -- on a cream bar with a hairline
- * under it, sticky, and solid rather than translucent so the editorial type
- * scrolling underneath never shows through it.
+ * Two bars, following the supplied design: a thin dark announcement strip in
+ * Arabic across the top, then the header proper -- serif logo left, mono
+ * navigation, cart right with a signal-red count.
  *
- * On a phone the centre navigation becomes a slide-out panel. No mega-menu:
- * there are four links.
+ * The announcement strip is the one place the page inverts, and it is what
+ * gives the top of the site its edge. It is deliberately small and says one
+ * true thing: this is the first release, and the quantity is limited.
+ *
+ * On a phone the navigation becomes a slide-out panel. No mega-menu: there are
+ * four links.
  */
 import { Link } from "@tanstack/react-router";
 import { Menu, ShoppingBag, X } from "lucide-react";
@@ -29,7 +33,6 @@ export function SiteHeader() {
     return () => window.removeEventListener("hashchange", close);
   }, [menuOpen]);
 
-  // Stop the page behind scrolling while the panel is open.
   useEffect(() => {
     if (!menuOpen) return;
     const previous = document.body.style.overflow;
@@ -40,69 +43,77 @@ export function SiteHeader() {
   }, [menuOpen]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-cream">
-      <div className="mx-auto flex h-[74px] max-w-page items-center justify-between gap-4 px-5 md:h-[100px] md:px-10 lg:px-16">
-        {/* Left: the logo, always English. */}
-        <Link
-          to="/"
-          className="font-display text-2xl leading-none tracking-tight text-ink md:text-[1.75rem]"
-        >
-          {BRAND.name}
-        </Link>
-
-        {/* Centre: navigation, English, on a desktop only. */}
-        <nav aria-label="Main" className="hidden md:block">
-          <ul className="flex items-center gap-9">
-            {NAV.map((item) => (
-              <li key={item.label}>
-                <NavItem item={item} />
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        {/* Right: the cart, and on a phone the menu button. */}
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={cart.open}
-            className="relative flex h-11 items-center gap-2 px-3 text-ink transition-colors hover:text-accent"
-            aria-label={`Cart, ${cart.count} item${cart.count === 1 ? "" : "s"}`}
-          >
-            <ShoppingBag className="h-5 w-5" strokeWidth={1.5} aria-hidden />
-            <span className="control hidden sm:inline">Cart</span>
-            {/* Rendered only once the stored cart has been read, so the
-                server-rendered header and the hydrated one agree. */}
-            {cart.ready && cart.count > 0 && (
-              <span
-                className="absolute right-1 top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1 font-sans text-[10px] leading-none text-paper"
-                aria-hidden
-              >
-                {cart.count}
-              </span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMenuOpen(true)}
-            className="flex h-11 w-11 items-center justify-center text-ink md:hidden"
-            aria-label="Open menu"
-            aria-expanded={menuOpen}
-          >
-            <Menu className="h-5 w-5" strokeWidth={1.5} aria-hidden />
-          </button>
-        </div>
+    <>
+      {/* The inverted strip. Arabic, centred, quiet. */}
+      <div
+        lang="ar"
+        dir="rtl"
+        className="border-b border-border bg-foreground px-4 py-2 text-center font-arabic text-[11px] text-background"
+      >
+        الإصدار الأول · كمية محدودة
       </div>
 
-      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
-    </header>
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
+        <div className="mx-auto flex h-16 max-w-page items-center justify-between gap-5 px-5 sm:px-8 lg:h-20 lg:gap-12">
+          {/* Logo: the serif, always English. */}
+          <Link
+            to="/"
+            className="truncate font-display text-xl leading-none sm:text-2xl lg:text-3xl"
+          >
+            {BRAND.name}
+          </Link>
+
+          <nav aria-label="Main" className="hidden md:block">
+            <ul className="flex items-center gap-8 lg:gap-10">
+              {NAV.map((item) => (
+                <li key={item.label}>
+                  <NavItem item={item} />
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="flex shrink-0 items-center justify-end gap-1">
+            <button
+              type="button"
+              onClick={cart.open}
+              className="relative flex h-11 items-center gap-2 px-3 transition-colors hover:text-signal"
+              aria-label={`Cart, ${cart.count} item${cart.count === 1 ? "" : "s"}`}
+            >
+              <ShoppingBag className="h-5 w-5" strokeWidth={1.5} aria-hidden />
+              <span className="label hidden sm:inline">Cart</span>
+              {/* Rendered only once the stored cart has been read, so the
+                  server-rendered header and the hydrated one agree. */}
+              {cart.ready && cart.count > 0 && (
+                <span
+                  className="absolute right-1 top-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-signal px-1 font-mono text-[10px] leading-none text-signal-foreground"
+                  aria-hidden
+                >
+                  {cart.count}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              className="flex h-11 w-11 items-center justify-center md:hidden"
+              aria-label="Open menu"
+              aria-expanded={menuOpen}
+            >
+              <Menu className="h-5 w-5" strokeWidth={1.5} aria-hidden />
+            </button>
+          </div>
+        </div>
+
+        {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
+      </header>
+    </>
   );
 }
 
 function NavItem({ item }: { item: (typeof NAV)[number] }) {
-  const className =
-    "control text-ink/70 transition-colors hover:text-accent [&.active]:text-accent";
+  const className = "label text-foreground/70 transition-colors hover:text-signal";
 
   // Section links point at an anchor on the homepage; TRACK ORDER is a page.
   if ("hash" in item && item.hash) {
@@ -113,7 +124,7 @@ function NavItem({ item }: { item: (typeof NAV)[number] }) {
     );
   }
   return (
-    <Link to={item.to} className={className}>
+    <Link to={item.to} className={className} activeProps={{ className: "label text-signal" }}>
       {item.label}
     </Link>
   );
@@ -124,23 +135,23 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 md:hidden">
       <button
         type="button"
-        className="absolute inset-0 bg-ink/20"
+        className="absolute inset-0 bg-foreground/25"
         onClick={onClose}
         aria-label="Close menu"
       />
       <nav
         aria-label="Main"
         className={cn(
-          "absolute inset-y-0 right-0 flex w-full max-w-sm flex-col bg-cream",
-          "border-l border-line px-6 pb-10 pt-6",
+          "absolute inset-y-0 right-0 flex w-full max-w-sm flex-col bg-background",
+          "border-l border-border px-6 pb-10 pt-6",
         )}
       >
         <div className="flex items-center justify-between">
-          <span className="font-display text-2xl text-ink">{BRAND.name}</span>
+          <span className="font-display text-xl">{BRAND.name}</span>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-11 w-11 items-center justify-center text-ink"
+            className="flex h-11 w-11 items-center justify-center"
             aria-label="Close menu"
           >
             <X className="h-5 w-5" strokeWidth={1.5} aria-hidden />
@@ -155,7 +166,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
                   to={item.to}
                   hash={item.hash}
                   onClick={onClose}
-                  className="block border-b border-line py-5 font-sans text-sm uppercase tracking-[0.14em] text-ink"
+                  className="block border-b border-border py-5 font-mono text-xs uppercase tracking-[0.2em]"
                 >
                   {item.label}
                 </Link>
@@ -163,7 +174,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
                 <Link
                   to={item.to}
                   onClick={onClose}
-                  className="block border-b border-line py-5 font-sans text-sm uppercase tracking-[0.14em] text-ink"
+                  className="block border-b border-border py-5 font-mono text-xs uppercase tracking-[0.2em]"
                 >
                   {item.label}
                 </Link>

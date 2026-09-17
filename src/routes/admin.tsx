@@ -85,7 +85,7 @@ function AdminPage() {
   if (gate === "notAdmin") {
     return (
       <Centered>
-        <p className="font-sans text-sm text-ink">
+        <p className="font-sans text-sm text-foreground">
           {email} is signed in, but is not an administrator.
         </p>
         <SignOutButton />
@@ -124,7 +124,7 @@ function SignIn({ onSignedIn }: { onSignedIn: () => void }) {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-5">
-      <h1 className="font-display text-3xl text-ink">Admin</h1>
+      <h1 className="font-display text-3xl text-foreground">Admin</h1>
 
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
@@ -138,7 +138,7 @@ function SignIn({ onSignedIn }: { onSignedIn: () => void }) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-12 border border-line bg-cream px-3 font-sans text-sm text-ink outline-none focus:border-accent"
+            className="h-12 border border-border bg-background px-3 font-sans text-sm text-foreground outline-none focus:border-signal"
           />
         </div>
 
@@ -153,7 +153,7 @@ function SignIn({ onSignedIn }: { onSignedIn: () => void }) {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-12 border border-line bg-cream px-3 font-sans text-sm text-ink outline-none focus:border-accent"
+            className="h-12 border border-border bg-background px-3 font-sans text-sm text-foreground outline-none focus:border-signal"
           />
         </div>
 
@@ -193,14 +193,14 @@ function AdminConsole({ email }: { email: string }) {
   return (
     <div className="mx-auto max-w-page px-5 py-10 md:px-10 lg:px-16">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-display text-3xl text-ink">Admin</h1>
+        <h1 className="font-display text-3xl text-foreground">Admin</h1>
         <div className="flex items-center gap-4">
           <span className="font-sans text-xs text-muted">{email}</span>
           <SignOutButton />
         </div>
       </div>
 
-      <nav className="mt-8 flex gap-6 border-b border-line">
+      <nav className="mt-8 flex gap-6 border-b border-border">
         {(["products", "orders", "shipping"] as const).map((name) => (
           <button
             key={name}
@@ -208,7 +208,7 @@ function AdminConsole({ email }: { email: string }) {
             onClick={() => setTab(name)}
             className={cn(
               "-mb-px border-b-2 pb-3 font-sans text-xs uppercase tracking-[0.14em] transition-colors",
-              tab === name ? "border-accent text-accent" : "border-transparent text-muted",
+              tab === name ? "border-signal text-signal" : "border-transparent text-muted",
             )}
           >
             {name}
@@ -270,10 +270,10 @@ function ProductRow({ product, onSaved }: { product: AdminProduct; onSaved: () =
   }
 
   return (
-    <div className="border border-line bg-paper p-6">
+    <div className="border border-border bg-card p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p dir="rtl" className="font-arabic text-lg text-ink">
+          <p dir="rtl" className="font-arabic text-lg text-foreground">
             {product.name}
           </p>
           <p className="mt-1 font-sans text-xs text-muted">{product.slug}</p>
@@ -285,7 +285,7 @@ function ProductRow({ product, onSaved }: { product: AdminProduct; onSaved: () =
           onClick={() => save({ slug: product.slug, active: !product.active })}
           className={cn(
             "border px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.14em] transition-colors",
-            product.active ? "border-success text-success" : "border-line text-muted",
+            product.active ? "border-success text-success" : "border-border text-muted",
           )}
         >
           {product.active ? "Active" : "Inactive"}
@@ -308,7 +308,7 @@ function ProductRow({ product, onSaved }: { product: AdminProduct; onSaved: () =
             step="0.01"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            className="h-11 w-32 border border-line bg-cream px-3 font-sans text-sm text-ink outline-none focus:border-accent"
+            className="h-11 w-32 border border-border bg-background px-3 font-sans text-sm text-foreground outline-none focus:border-signal"
           />
         </label>
 
@@ -320,7 +320,7 @@ function ProductRow({ product, onSaved }: { product: AdminProduct; onSaved: () =
             step="1"
             value={stock}
             onChange={(e) => setStock(e.target.value)}
-            className="h-11 w-28 border border-line bg-cream px-3 font-sans text-sm text-ink outline-none focus:border-accent"
+            className="h-11 w-28 border border-border bg-background px-3 font-sans text-sm text-foreground outline-none focus:border-signal"
           />
         </label>
 
@@ -354,7 +354,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="eyebrow">{label}</p>
-      <p className="mt-1 font-sans text-base text-ink">{value}</p>
+      <p className="mt-1 font-sans text-base text-foreground">{value}</p>
     </div>
   );
 }
@@ -397,7 +397,7 @@ function OrdersPanel() {
           placeholder="Order number or mobile number"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="h-11 w-full max-w-sm border border-line bg-cream px-3 font-sans text-sm text-ink outline-none focus:border-accent"
+          className="h-11 w-full max-w-sm border border-border bg-background px-3 font-sans text-sm text-foreground outline-none focus:border-signal"
         />
         <Button type="submit" size="sm" variant="outline" className="h-11" disabled={busy}>
           Search
@@ -434,10 +434,10 @@ function OrderCard({ order, onChanged }: { order: AdminOrder; onChanged: () => v
   }
 
   return (
-    <div className="border border-line bg-paper p-6">
+    <div className="border border-border bg-card p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="font-sans text-base tracking-wide text-ink">{order.orderNumber}</p>
+          <p className="font-sans text-base tracking-wide text-foreground">{order.orderNumber}</p>
           <p className="mt-1 font-sans text-xs text-muted">
             {new Date(order.placedAt).toLocaleString("en-GB")}
           </p>
@@ -463,7 +463,7 @@ function OrderCard({ order, onChanged }: { order: AdminOrder; onChanged: () => v
       <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
         <div>
           <p className="eyebrow">Customer</p>
-          <p className="mt-2 font-sans text-sm leading-relaxed text-ink">
+          <p className="mt-2 font-sans text-sm leading-relaxed text-foreground">
             {order.customerName}
             <br />
             {order.customerMobile}
@@ -478,7 +478,7 @@ function OrderCard({ order, onChanged }: { order: AdminOrder; onChanged: () => v
 
         <div>
           <p className="eyebrow">Deliver to</p>
-          <p className="mt-2 font-sans text-sm leading-relaxed text-ink">
+          <p className="mt-2 font-sans text-sm leading-relaxed text-foreground">
             {order.address["street"]}, Building {order.address["building"]}, Floor{" "}
             {order.address["floor"]}, Apt {order.address["apartment"]}
             <br />
@@ -490,10 +490,10 @@ function OrderCard({ order, onChanged }: { order: AdminOrder; onChanged: () => v
         </div>
       </div>
 
-      <ul className="mt-5 flex flex-col gap-2 border-t border-line pt-5">
+      <ul className="mt-5 flex flex-col gap-2 border-t border-border pt-5">
         {order.lines.map((line, index) => (
           <li key={index} className="flex items-center justify-between gap-4">
-            <span dir="rtl" className="font-arabic text-sm text-ink">
+            <span dir="rtl" className="font-arabic text-sm text-foreground">
               {line.name}
             </span>
             <span className="font-sans text-xs text-muted">
@@ -503,9 +503,9 @@ function OrderCard({ order, onChanged }: { order: AdminOrder; onChanged: () => v
         ))}
       </ul>
 
-      <div className="mt-4 flex items-baseline justify-between border-t border-line pt-4">
-        <span className="control text-ink">Total</span>
-        <span className="font-sans text-base text-ink">{formatEGP(order.total)}</span>
+      <div className="mt-4 flex items-baseline justify-between border-t border-border pt-4">
+        <span className="control text-foreground">Total</span>
+        <span className="font-sans text-base text-foreground">{formatEGP(order.total)}</span>
       </div>
 
       {order.paymobTransactionId && (
@@ -514,7 +514,7 @@ function OrderCard({ order, onChanged }: { order: AdminOrder; onChanged: () => v
         </p>
       )}
 
-      <div className="mt-5 flex flex-wrap gap-2 border-t border-line pt-5">
+      <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-5">
         {FULFILMENT_FLOW.map((status) => (
           <button
             key={status}
@@ -524,8 +524,8 @@ function OrderCard({ order, onChanged }: { order: AdminOrder; onChanged: () => v
             className={cn(
               "border px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.14em] transition-colors",
               order.fulfilmentStatus === status
-                ? "border-accent text-accent"
-                : "border-line text-muted hover:border-ink hover:text-ink",
+                ? "border-signal text-signal"
+                : "border-border text-muted hover:border-foreground hover:text-foreground",
               "disabled:cursor-not-allowed",
             )}
           >
@@ -542,7 +542,7 @@ function OrderCard({ order, onChanged }: { order: AdminOrder; onChanged: () => v
               void move("cancelled");
             }
           }}
-          className="border border-error/50 px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.14em] text-error transition-colors hover:bg-error hover:text-paper disabled:cursor-not-allowed disabled:opacity-40"
+          className="border border-error/50 px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.14em] text-error transition-colors hover:bg-error hover:text-background disabled:cursor-not-allowed disabled:opacity-40"
         >
           cancel
         </button>
@@ -564,7 +564,7 @@ function Badge({
         "border px-2.5 py-1 font-sans text-[11px] uppercase tracking-[0.12em]",
         tone === "good" && "border-success text-success",
         tone === "bad" && "border-error text-error",
-        tone === "neutral" && "border-line text-muted",
+        tone === "neutral" && "border-border text-muted",
       )}
     >
       {children}
@@ -592,16 +592,16 @@ function ShippingPanel() {
   return (
     <div className="flex flex-col gap-6">
       {unset > 0 && (
-        <p className="border border-line bg-paper p-4 font-sans text-sm text-muted">
+        <p className="border border-border bg-card p-4 font-sans text-sm text-muted">
           {unset} governorate{unset === 1 ? " has" : "s have"} a fee of zero. Those ship free until
           a real fee is entered.
         </p>
       )}
 
-      <div className="overflow-x-auto border border-line">
-        <table className="w-full min-w-[42rem] bg-paper">
+      <div className="overflow-x-auto border border-border">
+        <table className="w-full min-w-[42rem] bg-card">
           <thead>
-            <tr className="border-b border-line text-left">
+            <tr className="border-b border-border text-left">
               {["Governorate", "Fee (EGP)", "COD", "Min days", "Max days", ""].map((heading) => (
                 <th
                   key={heading}
@@ -652,11 +652,11 @@ function ZoneRow({ zone, onSaved }: { zone: AdminZone; onSaved: () => void }) {
   }
 
   const cellInput =
-    "h-9 w-24 border border-line bg-cream px-2 font-sans text-sm text-ink outline-none focus:border-accent";
+    "h-9 w-24 border border-border bg-background px-2 font-sans text-sm text-foreground outline-none focus:border-signal";
 
   return (
-    <tr className="border-b border-line last:border-0">
-      <td className="px-4 py-3 font-sans text-sm text-ink">{zone.governorate}</td>
+    <tr className="border-b border-border last:border-0">
+      <td className="px-4 py-3 font-sans text-sm text-foreground">{zone.governorate}</td>
       <td className="px-4 py-3">
         <input
           type="number"

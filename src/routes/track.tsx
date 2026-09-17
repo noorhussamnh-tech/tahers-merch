@@ -73,7 +73,7 @@ function TrackPage() {
   return (
     <>
       <div className="mx-auto max-w-3xl px-5 py-16 md:px-10 md:py-24">
-        <h1 className="font-display text-headline text-ink">Track your order</h1>
+        <h1 className="font-display text-headline text-foreground">Track your order</h1>
         <p dir="rtl" className="mt-4 font-arabic text-base leading-loose text-muted">
           أدخل رقم الطلب ورقم الموبايل الذي طلبت به.
         </p>
@@ -90,7 +90,7 @@ function TrackPage() {
               placeholder="TC-XXXXXXXX"
               value={orderNumber}
               onChange={(e) => setOrderNumber(e.target.value)}
-              className="h-12 w-full border border-line bg-cream px-3 font-sans text-sm uppercase tracking-wide text-ink outline-none transition-colors placeholder:normal-case placeholder:text-muted/60 focus:border-accent"
+              className="h-12 w-full border border-border bg-background px-3 font-sans text-sm uppercase tracking-wide text-foreground outline-none transition-colors placeholder:normal-case placeholder:text-muted/60 focus:border-signal"
             />
           </div>
 
@@ -107,7 +107,7 @@ function TrackPage() {
               placeholder="01012345678"
               value={mobile}
               onChange={(e) => setMobile(e.target.value)}
-              className="h-12 w-full border border-line bg-cream px-3 font-sans text-sm text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-accent"
+              className="h-12 w-full border border-border bg-background px-3 font-sans text-sm text-foreground outline-none transition-colors placeholder:text-muted/60 focus:border-signal"
             />
           </div>
 
@@ -118,8 +118,8 @@ function TrackPage() {
 
         {/* One message for both "no such order" and "wrong mobile number". */}
         {state === "notFound" && (
-          <div className="mt-8 border border-line bg-paper p-5">
-            <p className="font-sans text-sm text-ink">
+          <div className="mt-8 border border-border bg-card p-5">
+            <p className="font-sans text-sm text-foreground">
               We could not find an order matching those details.
             </p>
             <p className="mt-2 font-sans text-xs leading-relaxed text-muted">
@@ -147,28 +147,30 @@ function OrderDetail({ order }: { order: TrackedOrder }) {
   const reachedIndex = FULFILMENT_FLOW.indexOf(order.fulfilmentStatus);
 
   return (
-    <div className="mt-12 border border-line bg-paper">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line px-6 py-5">
+    <div className="mt-12 border border-border bg-card">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-6 py-5">
         <div>
           <p className="eyebrow">Order number</p>
-          <p className="mt-1 font-sans text-lg tracking-wide text-ink">{order.orderNumber}</p>
+          <p className="mt-1 font-sans text-lg tracking-wide text-foreground">
+            {order.orderNumber}
+          </p>
         </div>
         <span
           className={cn(
             "border px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.14em]",
             order.paymentStatus === "paid"
               ? "border-success text-success"
-              : "border-line text-muted",
+              : "border-border text-muted",
           )}
         >
           Payment {order.paymentStatus}
         </span>
       </div>
 
-      <ul className="flex flex-col gap-3 border-b border-line px-6 py-6">
+      <ul className="flex flex-col gap-3 border-b border-border px-6 py-6">
         {order.lines.map((line, index) => (
           <li key={`${line.name}-${index}`} className="flex items-center justify-between gap-4">
-            <span dir="rtl" className="font-arabic text-base text-ink">
+            <span dir="rtl" className="font-arabic text-base text-foreground">
               {line.name}
             </span>
             <span className="font-sans text-xs text-muted">× {line.quantity}</span>
@@ -176,9 +178,9 @@ function OrderDetail({ order }: { order: TrackedOrder }) {
         ))}
       </ul>
 
-      <div className="flex items-baseline justify-between border-b border-line px-6 py-5">
-        <span className="control text-ink">Total</span>
-        <span className="font-sans text-lg text-ink">{formatEGP(order.total)}</span>
+      <div className="flex items-baseline justify-between border-b border-border px-6 py-5">
+        <span className="control text-foreground">Total</span>
+        <span className="font-sans text-lg text-foreground">{formatEGP(order.total)}</span>
       </div>
 
       {/* The timeline. A cancelled order shows the plain history rather than
@@ -199,19 +201,24 @@ function OrderDetail({ order }: { order: TrackedOrder }) {
                     <span
                       className={cn(
                         "mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full border",
-                        reached ? "border-accent bg-accent" : "border-line bg-cream",
+                        reached ? "border-signal bg-signal" : "border-border bg-background",
                       )}
                       aria-hidden
                     />
                     {index < FULFILMENT_FLOW.length - 1 && (
                       <span
-                        className={cn("w-px flex-1", reached ? "bg-accent/40" : "bg-line")}
+                        className={cn("w-px flex-1", reached ? "bg-signal/40" : "bg-line")}
                         aria-hidden
                       />
                     )}
                   </div>
                   <div className="pb-6">
-                    <p className={cn("font-sans text-sm", reached ? "text-ink" : "text-muted/60")}>
+                    <p
+                      className={cn(
+                        "font-sans text-sm",
+                        reached ? "text-foreground" : "text-muted/60",
+                      )}
+                    >
                       {STATUS_LABEL[step]}
                     </p>
                     {event && (
@@ -240,11 +247,11 @@ function OrderDetail({ order }: { order: TrackedOrder }) {
         )}
       </div>
 
-      <div className="border-t border-line px-6 py-5">
+      <div className="border-t border-border px-6 py-5">
         <Link
           to="/"
           hash="shop"
-          className="control text-muted underline underline-offset-4 transition-colors hover:text-accent"
+          className="control text-muted underline underline-offset-4 transition-colors hover:text-signal"
         >
           {UI.continueShopping}
         </Link>
