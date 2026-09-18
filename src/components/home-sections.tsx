@@ -176,6 +176,14 @@ export function SiteFooter() {
                   FAQ
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/privacy"
+                  className="label text-background/55 transition-colors hover:text-background"
+                >
+                  PRIVACY
+                </Link>
+              </li>
             </ul>
           </nav>
           <p className="label-sm text-background/55 md:text-end">

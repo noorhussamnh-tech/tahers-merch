@@ -56,7 +56,8 @@ means free delivery, and the database has no way to express "unknown" for a
 | 6 | **Material / fabric composition** | `"سيتم إضافة تفاصيل الخامة بعد تأكيدها."` | `src/lib/catalog/copy.ts` → `FAQ`, the `material` entry |
 | 7 | **Delivery period per governorate** | `null` — no estimate is shown at all | `/admin` → Shipping, Min/Max days |
 | 8 | **Return and exchange policy** | Generic sentence pointing at "the store policy" | `tc_store_settings` key `returns_policy_ar`, and the `returns` FAQ entry |
-| 9 | **Support contact** (WhatsApp / email) | `null` | `tc_store_settings` key `support_contact` |
+| 9 | **Support contact** (WhatsApp / email) | `null`, and the privacy page says so in as many words | `tc_store_settings` key `support_contact`, and the CONTACT section of `src/routes/privacy.tsx` |
+| 9b | **An Arabic privacy page** | English only, matching the FAQ — but the customers read Arabic and this is the one page where precision matters to them | `src/routes/privacy.tsx` |
 | 10 | **Which governorates allow cash on delivery** | Cairo and Giza, the only two seeded | `/admin` → Shipping, COD column |
 | 11 | **Discount codes** | None — `{}` | `tc_store_settings` key `discount_codes` |
 
