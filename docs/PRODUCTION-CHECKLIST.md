@@ -134,6 +134,8 @@ DATABASE_URL=… ./scripts/test-db.sh    # schema, RLS, concurrency
 
 ## 8. Launch day
 
+- [ ] Everyone running the shop has read [`RUNBOOK.md`](RUNBOOK.md),
+      and the three jobs in its first table have real names against them
 - [ ] Both caps activated
 - [ ] One test order placed on production and then cancelled in admin —
       confirm the stock comes back

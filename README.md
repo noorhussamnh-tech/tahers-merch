@@ -300,6 +300,7 @@ whose aspect ratio differs from the frame is letterboxed, not sliced.
 
 | | |
 |---|---|
+| [`docs/RUNBOOK.md`](docs/RUNBOOK.md) | **How to run the shop day to day. Written for whoever owns it, not for a developer** |
 | [`docs/MISSING-INFORMATION.md`](docs/MISSING-INFORMATION.md) | Everything the business has not supplied, and every decision taken in its absence |
 | [`docs/PAYMOB.md`](docs/PAYMOB.md) | The payment flow, sandbox testing, and what must be true before real money |
 | [`docs/ADMIN-SETUP.md`](docs/ADMIN-SETUP.md) | Creating an administrator; disabling public sign-up |
