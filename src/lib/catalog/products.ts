@@ -57,12 +57,13 @@ export interface ProductContent {
   /** Arabic product name. Also the <h*> for the product's section. */
   readonly name: string;
   /**
-   * The phrase that carries the product. Set in the editorial serif at the
-   * largest size the section allows.
+   * The phrase that carries the product, set in the signal red under the name.
+   * Optional: a product can stand on its name and its photograph alone, and
+   * both currently do.
    */
-  readonly primaryPhrase: string;
-  /** The line under it. Smaller, same face. */
-  readonly secondaryPhrase: string;
+  readonly primaryPhrase?: string;
+  /** The line under it. Smaller, muted. Optional for the same reason. */
+  readonly secondaryPhrase?: string;
   /**
    * Shown once, small, as a photographic annotation -- never at the weight of
    * the two lines above. Absent on a product that has no third line.
@@ -141,15 +142,12 @@ const PHOTO_READY = true;
  * Supplied photography: the cap worn, shot from behind against the sea. Green
  * cotton, the phrase embroidered in white across the back on a single line.
  *
- * Hierarchy, in the order the brief sets it: the product name, then the
- * question, then the waiting line, then -- small, once -- the aside.
+ * No phrases in the copy. The cap says تايوان يا ريس on it; the page does not
+ * need to say it three more times underneath.
  */
 const TAIWAN: ProductContent = {
   slug: "taiwan",
   name: "تايوان يا ريس",
-  primaryPhrase: "مش هنصيف في تايوان يا ريس؟",
-  secondaryPhrase: "لأجل مصيف أفضل سأنتظر.",
-  accentPhrase: "اغضب يا شي جين بينج.",
   description: "كاب مطرّز بعبارة «تايوان يا ريس».",
   colour: "أخضر بتطريز أبيض",
   images: [
@@ -181,7 +179,8 @@ const TAIWAN: ProductContent = {
 const AL_ADOU: ProductContent = {
   slug: "al-adou",
   name: "العدو ليس بهذه القوة",
-  primaryPhrase: "العدو ليس بهذه القوة",
+  // No primaryPhrase: it was the product name over again, in red, directly
+  // under the product name.
   secondaryPhrase: "ونحن لسنا بهذا الضعف.",
   fullPhrase: "العدو ليس بهذه القوة، ونحن لسنا بهذا الضعف.",
   description: "كاب مطرّز بإحدى أشهر عبارات طاهر.",

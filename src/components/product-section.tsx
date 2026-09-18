@@ -5,16 +5,12 @@
  * alternate which side the photography sits on, so the page reads as a spread
  * rather than as a catalogue.
  *
- * The type hierarchy is the brief's, and it is the thing to preserve if this
- * component is ever reworked:
- *
- *   1. the product name, largest;
- *   2. the main phrase, in the editorial serif;
- *   3. the second line, smaller;
- *   4. the aside, tiny, once, as a photographic annotation.
- *
- * Giving all three phrases the same weight is the failure mode; the aside in
- * particular is a caption, not a headline.
+ * Every line of copy below the product name is optional, and both caps
+ * currently run with almost none: the phrase is embroidered on the cap and
+ * visible in the photograph, so repeating it three times underneath adds
+ * nothing. Where a phrase does appear, the order is name, then the red line,
+ * then the muted line, then the aside as a caption on the photograph -- the
+ * aside is never a headline.
  */
 import { useState } from "react";
 
@@ -85,11 +81,15 @@ export function ProductSection({
               {content.name}
             </h3>
 
-            <p className="phrase font-arabic text-[1.5rem] leading-[1.6] text-signal sm:text-[1.875rem]">
-              {content.primaryPhrase}
-            </p>
+            {content.primaryPhrase && (
+              <p className="phrase font-arabic text-[1.5rem] leading-[1.6] text-signal sm:text-[1.875rem]">
+                {content.primaryPhrase}
+              </p>
+            )}
 
-            <p className="font-arabic text-lg leading-8 text-muted">{content.secondaryPhrase}</p>
+            {content.secondaryPhrase && (
+              <p className="font-arabic text-lg leading-8 text-muted">{content.secondaryPhrase}</p>
+            )}
 
             {/* Product two only: the two lines written out together, once. */}
             {content.fullPhrase && (

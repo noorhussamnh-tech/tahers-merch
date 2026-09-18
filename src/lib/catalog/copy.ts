@@ -10,13 +10,18 @@
  * attributed to Taher that he did not say.
  */
 
-/** English navigation. Never translated. */
-export const NAV = [
-  { label: "SHOP", to: "/", hash: "shop" },
-  { label: "ABOUT", to: "/", hash: "about" },
-  { label: "FAQ", to: "/", hash: "faq" },
-  { label: "TRACK ORDER", to: "/track" },
-] as const;
+/**
+ * Header navigation. Deliberately empty.
+ *
+ * The site is one page with two products on it; there was nothing to navigate
+ * to that scrolling does not reach. The header is now the wordmark and the
+ * cart, and nothing else.
+ *
+ * TRACK ORDER and FAQ still live in the footer -- a customer chasing an order
+ * needs a way in, and the order confirmation links there directly. Putting a
+ * link back here is a matter of adding an entry to this array.
+ */
+export const NAV: readonly { label: string; to: "/" | "/track"; hash?: string }[] = [];
 
 /** English functional labels, fixed by the brief. */
 export const UI = {
