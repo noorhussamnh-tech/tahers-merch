@@ -60,6 +60,27 @@ only thing left is to activate the caps in `/admin` when you mean to open. See
 | `node scripts/build-setup-sql.mjs` | Regenerate the one-paste `supabase/setup.sql` from the migrations |
 | `node scripts/optimize-images.mjs` | Turn supplied photographs into the AVIF/WebP variants |
 
+Bun, not npm, and not a preference: `npm install` cannot install this project.
+npm 10's resolver crashes on vitest's peer dependencies — `Cannot read
+properties of null (reading 'edgesOut')` — before it installs anything. The
+lockfile here is `bun.lock`, there is no `package-lock.json`, and one cannot be
+generated until npm can resolve the tree. Vercel is pointed at bun for the same
+reason.
+
+### Which build is live
+
+```
+curl https://<your-site>/api/version
+```
+
+Answers with the commit the deployed site was built from, its branch, and the
+moment it replied. It reads Vercel's own variables at request time, is never
+cached, and echoes nothing else from the environment.
+
+Use it whenever a change "isn't showing". If the commit it reports is not the
+one you pushed, the site is stale and the answer is in Vercel's Deployments
+tab — a build that is still queued, or one that failed — not in the code.
+
 ---
 
 ## 2. What the site is

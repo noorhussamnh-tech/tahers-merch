@@ -144,6 +144,12 @@ DATABASE_URL=… ./scripts/test-db.sh    # schema, RLS, concurrency
 
 ## After launch
 
+- **A change "isn't showing"** → `curl https://<your-site>/api/version` and
+  compare the commit with `git log -1 --format=%h`. Same commit means the site
+  is current and the change is not where you are looking; a different one means
+  the deployment is behind, and Vercel's Deployments tab says whether it is
+  queued or failed. Vercel keeps serving the last good build when one fails, so
+  a stale site is the normal symptom of a broken build — not an error page
 - Reservations released on time (watch `reserved_quantity` on both products;
   it should not creep upwards)
 - Orders stuck in `pending` for more than an hour — a webhook that is not

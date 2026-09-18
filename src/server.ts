@@ -11,6 +11,7 @@
  *      failed.
  */
 import { handlePaymobWebhook } from "./lib/paymob/webhook.server";
+import { versionResponse } from "./lib/version.server";
 import { renderErrorPage } from "./lib/error-page";
 import { withSecurityHeaders } from "./lib/security-headers";
 
@@ -32,10 +33,20 @@ async function getServerEntry(): Promise<ServerEntry> {
 /** The path Paymob is told to notify. Changing it means changing the dashboard. */
 const WEBHOOK_PATH = "/api/paymob/webhook";
 
+/** Says which commit is live. See lib/version.server.ts for why it exists. */
+const VERSION_PATH = "/api/version";
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const url = new URL(request.url);
+
+      // Before anything else, and deliberately: if the app itself is broken,
+      // this still has to answer, because it is how you find out which build
+      // is broken.
+      if (url.pathname === VERSION_PATH) {
+        return withSecurityHeaders(versionResponse());
+      }
 
       if (url.pathname === WEBHOOK_PATH) {
         if (request.method !== "POST") {
