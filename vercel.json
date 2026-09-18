@@ -1,7 +1,26 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
+
+  "//": [
+    "Bun, not npm, and deliberately.",
+    "",
+    "`npm install` cannot install this project at all. npm 10's dependency",
+    "resolver crashes -- `Cannot read properties of null (reading 'edgesOut')`",
+    "-- while working out vitest's peer dependencies, and it crashes before",
+    "installing anything, so the build never starts. It is an npm bug, not a",
+    "bad dependency: bun installs the same package.json in under a second.",
+    "",
+    "The lockfile in the repository is bun.lock. There is no package-lock.json",
+    "and there cannot be one until npm can resolve the tree, so pointing Vercel",
+    "at npm means pointing it at a command that fails every time.",
+    "",
+    "If this is ever moved back to npm, generate a working package-lock.json",
+    "FIRST and check that a clean clone installs from it."
+  ],
+
+  "installCommand": "bun install",
+  "buildCommand": "bun run build",
+
   "framework": null,
   "github": { "silent": true }
 }
