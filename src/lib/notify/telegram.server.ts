@@ -1,15 +1,12 @@
 /**
- * New-order notifications, over Telegram. SERVER ONLY.
+ * New-order notifications over Telegram. SERVER ONLY.
  *
- * Telegram rather than email or WhatsApp, for three reasons that matter at
- * this size: it is free, it needs no domain (which this shop does not have
- * yet), and setup is a five-minute conversation with a bot rather than a
- * business verification. A group with both of you in it means one message
- * reaches whoever is closer to a laptop.
+ * One of the channels behind ./order-notification.server.ts, and not the
+ * default -- email is. Kept because it costs nothing to keep, needs no domain,
+ * and a group chat is a genuinely good place for this if anybody ever wants it.
  *
- * WhatsApp would be the nicer place to receive these, but its Business API
- * needs verification, a provider and a per-message cost. Worth revisiting if
- * the volume ever justifies it.
+ * WhatsApp would be nicer still, but its Business API needs verification, a
+ * provider and a per-message fee.
  *
  * THE RULE THIS FILE EXISTS TO ENFORCE: a notification must never break an
  * order. Telegram being down, rate-limiting, or simply unconfigured has to
@@ -17,22 +14,12 @@
  * swallows its own errors and logs them, and the caller is expected not to
  * await it.
  */
+import type { OrderNotification } from "./order-notification.server";
 
 const TELEGRAM_API = "https://api.telegram.org";
 
 export function telegramConfigured(): boolean {
   return Boolean(process.env["TELEGRAM_BOT_TOKEN"] && process.env["TELEGRAM_CHAT_ID"]);
-}
-
-interface OrderNotification {
-  readonly orderNumber: string;
-  readonly customerName: string;
-  readonly customerMobile: string;
-  readonly governorate: string;
-  readonly city: string;
-  readonly total: number;
-  readonly paymentMethod: "cod" | "paymob";
-  readonly lines: readonly { name: string; quantity: number }[];
 }
 
 /** Telegram's HTML mode needs these three escaped, and only these three. */
@@ -69,7 +56,7 @@ function buildMessage(order: OrderNotification): string {
  * Call it without awaiting: the customer should not wait on Telegram, and a
  * slow response here would sit directly in the checkout's critical path.
  */
-export async function notifyNewOrder(order: OrderNotification): Promise<void> {
+export async function notifyNewOrderTelegram(order: OrderNotification): Promise<void> {
   const token = process.env["TELEGRAM_BOT_TOKEN"];
   const chatId = process.env["TELEGRAM_CHAT_ID"];
 

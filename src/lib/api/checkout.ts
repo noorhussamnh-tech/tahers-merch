@@ -18,7 +18,7 @@ import { getServiceClient, toApiError } from "@/lib/supabase/service.server";
 import { ApiError } from "@/lib/errors";
 import { checkoutSchema, type CheckoutInput } from "@/lib/domain/validation";
 import { createIntention, paymobConfigured } from "@/lib/paymob/client.server";
-import { notifyNewOrder } from "@/lib/notify/telegram.server";
+import { notifyNewOrder } from "@/lib/notify/order-notification.server";
 import { siteUrl } from "@/lib/supabase/config";
 import type { PlacedOrder, PricedLine } from "@/lib/domain/types";
 
@@ -179,6 +179,11 @@ export const placeOrder = createServerFn({ method: "POST" })
       customerMobile: data.customer.mobile,
       governorate: data.address.governorate,
       city: data.address.city,
+      street: data.address.street,
+      building: data.address.building,
+      floor: data.address.floor,
+      apartment: data.address.apartment,
+      notes: data.address.notes,
       total: order.total,
       paymentMethod: data.paymentMethod,
       lines: order.lines.map((line) => ({ name: line.name, quantity: line.quantity })),
