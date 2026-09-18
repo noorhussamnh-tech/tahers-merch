@@ -31,10 +31,12 @@ photography is what makes it worth visiting.
 
 - **Price — 950.00 EGP**, both caps, seeded as `95000` piastres.
 - **Stock — 20 of each cap**, 40 in the first run.
-- **Shipping — 100.00 EGP flat**, seeded as `10000` piastres against all 27
-  governorates. Flat because one figure was supplied, not a table of them; with
-  most Egyptian couriers, reaching Aswan costs more than crossing Cairo, so
-  vary it per governorate in `/admin` once the courier's rate card is known.
+- **Shipping — 100.00 EGP flat**, seeded as `10000` piastres against **Cairo
+  and Giza, and nowhere else**. The delivery area is the set of rows in
+  `tc_shipping_zones`: a governorate without one cannot be quoted and cannot be
+  ordered to, which is what makes the FAQ's "Cairo and Giza only" true rather
+  than merely stated. Add a row and the promise breaks, so add the row and the
+  copy together. Flat because one figure was supplied, not a table of them.
 - **Cap colours** — green with white thread (تايوان يا ريس), burgundy with
   cream thread (العدو ليس بهذه القوة). Recorded on `ProductContent.colour` in
   `src/lib/catalog/products.ts` and shown on each product section. The brief
@@ -55,7 +57,7 @@ means free delivery, and the database has no way to express "unknown" for a
 | 7 | **Delivery period per governorate** | `null` — no estimate is shown at all | `/admin` → Shipping, Min/Max days |
 | 8 | **Return and exchange policy** | Generic sentence pointing at "the store policy" | `tc_store_settings` key `returns_policy_ar`, and the `returns` FAQ entry |
 | 9 | **Support contact** (WhatsApp / email) | `null` | `tc_store_settings` key `support_contact` |
-| 10 | **Which governorates allow cash on delivery** | All 27 allow it | `/admin` → Shipping, COD column |
+| 10 | **Which governorates allow cash on delivery** | Cairo and Giza, the only two seeded | `/admin` → Shipping, COD column |
 | 11 | **Discount codes** | None — `{}` | `tc_store_settings` key `discount_codes` |
 
 On (7): the storefront shows no delivery estimate at all while these are null,

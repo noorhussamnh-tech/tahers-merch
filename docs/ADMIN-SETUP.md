@@ -63,11 +63,14 @@ the stock, whichever way it left — a cash order had it deducted at checkout,
 an unpaid online order still has it on hold — and asks for confirmation first.
 
 **Shipping** — the fee, cash-on-delivery availability, and the delivery
-estimate for each of the 27 governorates. A fee of zero means free delivery,
-so the tab counts how many are still at zero and warns.
+estimate for each governorate the shop delivers to. Cairo and Giza are seeded
+and nothing else is: the list on this tab *is* the delivery area, because a
+governorate with no row here cannot be ordered to. A fee of zero means free
+delivery, so the tab counts how many are still at zero and warns.
 
-There is deliberately no revenue dashboard, no customer list, no export and no
-bulk editing. Two products do not need them.
+Orders can be exported as a CSV for a courier. Beyond that there is
+deliberately no revenue dashboard, no customer list and no bulk editing. Two
+products do not need them.
 
 ---
 
