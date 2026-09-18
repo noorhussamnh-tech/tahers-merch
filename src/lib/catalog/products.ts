@@ -119,28 +119,21 @@ function photo(
 }
 
 /**
- * The supplied photographs are 1024x1024.
+ * The real intrinsic size of each photograph.
  *
- * This has to be the REAL intrinsic size, not an aspiration: the gallery
- * filters its srcset by it, and claiming 1600 here made the browser ask for a
- * 1200px variant the optimiser had never written, which showed up as a broken
- * image. If a future photograph is shot larger, raise this to match it.
+ * These have to be the TRUE dimensions, not an aspiration. The gallery filters
+ * its srcset by them, and once claiming 1600 for a 1024px file made the
+ * browser request a variant the optimiser had never written -- which rendered
+ * as a broken image where the cap should have been. Measured, not guessed:
+ * run the optimiser and it prints each photograph's size.
+ *
+ * Both caps are shot near-square, so both reserve a square box.
  */
-const SQUARE = { width: 1024, height: 1024 };
+const TAIWAN_SIZE = { width: 1350, height: 1346 };
+const AL_ADOU_SIZE = { width: 1024, height: 1024 };
 
-/**
- * Whether each cap's photograph is actually on disk.
- *
- * Not one switch any more: the burgundy cap's photograph arrived with the
- * design export and has been processed into AVIF/WebP variants, while the
- * green cap's did not -- the export carried only a Lovable asset pointer for
- * it, and the file behind that pointer is gone (404).
- *
- * Set TAIWAN_PHOTO_READY to true once that photograph is dropped into
- * public/images/products/taiwan/originals/main.jpg and the optimiser has run.
- */
-const TAIWAN_PHOTO_READY = false;
-const AL_ADOU_PHOTO_READY = true;
+/** Both photographs are in the repository and optimised. */
+const PHOTO_READY = true;
 
 /**
  * PRODUCT ONE -- تايوان يا ريس
@@ -167,8 +160,8 @@ const TAIWAN: ProductContent = {
       "taiwan",
       "main",
       "شخص يرتدي كاب «تايوان يا ريس» الأخضر، مصوَّرًا من الخلف أمام البحر، والعبارة مطرّزة بالأبيض على ظهر الكاب.",
-      SQUARE,
-      TAIWAN_PHOTO_READY,
+      TAIWAN_SIZE,
+      PHOTO_READY,
     ),
   ],
 };
@@ -198,8 +191,8 @@ const AL_ADOU: ProductContent = {
       "al-adou",
       "main",
       "شخص يرتدي كاب «العدو ليس بهذه القوة» النبيتي، مصوَّرًا من الخلف أمام البحر، والعبارة مطرّزة على سطرين.",
-      SQUARE,
-      AL_ADOU_PHOTO_READY,
+      AL_ADOU_SIZE,
+      PHOTO_READY,
     ),
   ],
 };

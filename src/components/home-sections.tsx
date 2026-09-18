@@ -25,14 +25,10 @@ import { PRODUCT_CONTENT, mainImage, productContent } from "@/lib/catalog/produc
  */
 export function Hero() {
   /*
-   * The burgundy cap leads, because its photograph is the one that exists.
-   * The design's own hero used the green cap, but that file did not survive
-   * the export -- it came through as a Lovable asset pointer whose target is
-   * gone -- and a hero built on a "photo pending" panel is worse than a hero
-   * built on the other cap. Swap this back to "taiwan" when that photograph
-   * is supplied.
+   * The green cap leads, as the supplied design had it. It was briefly the
+   * burgundy one while the green photograph was missing from the export.
    */
-  const heroSlug = "al-adou" as const;
+  const heroSlug = "taiwan" as const;
   const image = mainImage(heroSlug);
 
   return (
@@ -77,7 +73,7 @@ export function Hero() {
               {productContent(heroSlug).name}
             </span>
             <span dir="ltr" className="label-sm shrink-0">
-              Burgundy cap
+              Green cap
             </span>
           </div>
         </div>
