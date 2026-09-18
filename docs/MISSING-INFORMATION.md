@@ -30,7 +30,7 @@ photography is what makes it worth visiting.
 ### Supplied
 
 - **Price — 950.00 EGP**, both caps, seeded as `95000` piastres.
-- **Stock — 20 of each cap**, 40 in the first run.
+- **Stock — 10 of each cap**, 20 in the first run.
 - **Shipping — 100.00 EGP flat**, seeded as `10000` piastres against **Cairo
   and Giza, and nowhere else**. The delivery area is the set of rows in
   `tc_shipping_zones`: a governorate without one cannot be quoted and cannot be

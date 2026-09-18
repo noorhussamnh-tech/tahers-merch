@@ -316,7 +316,7 @@ whose aspect ratio differs from the frame is letterboxed, not sliced.
 ## Current state
 
 The shop ships **closed**, and `active = false` is the only thing holding it
-closed. Every commercial figure is real: 950.00 EGP a cap, 20 of each, and a
+closed. Every commercial figure is real: 950.00 EGP a cap, 10 of each, and a
 flat 100.00 EGP to deliver anywhere in Egypt.
 
 That is a change worth noticing. Earlier the shop was safe twice over — a price

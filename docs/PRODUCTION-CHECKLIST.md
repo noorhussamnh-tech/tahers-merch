@@ -27,7 +27,7 @@ shop immediately. That flip is the last box in section 8, and it belongs there.
 Supplied and seeded — verify these landed rather than setting them:
 
 - [x] Price: 950.00 EGP on both caps
-- [x] Stock: 20 each, 40 total
+- [x] Stock: 10 each, 20 total
 - [x] Shipping: 100.00 EGP flat, Cairo and Giza only
 
 Still to decide:

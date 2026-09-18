@@ -1393,7 +1393,7 @@ grant execute on function tc_is_admin() to authenticated;
 -- Every commercial figure below is real and supplied by the business:
 --
 --   price     950.00 EGP  -> 95000 piastres, both caps
---   stock     20 each     -> 40 in total
+--   stock     10 each     -> 20 in total
 --   shipping  100.00 EGP  -> 10000 piastres, flat, every governorate
 --
 -- Earlier revisions of this seed were safe twice over: a price of zero and a
@@ -1405,14 +1405,18 @@ grant execute on function tc_is_admin() to authenticated;
 -- Before flipping it, see docs/PRODUCTION-CHECKLIST.md. Photography, Paymob
 -- credentials and a domain are all still outstanding.
 
--- 95000 piastres = 950.00 EGP, and 20 of each cap: a 40-piece first run.
+-- 95000 piastres = 950.00 EGP, and 10 of each cap: a 20-piece first run.
+--
+-- Twenty, not forty. The run was halved after the figure was first supplied,
+-- which matters more than it looks: a sell-out is now half as far away, and
+-- there is no waiting list behind it. When it is gone it is gone.
 --
 -- `active` stays false. See the note at the top of this file -- it is the only
 -- thing between this seed and a live shop now.
 insert into tc_products (slug, name_ar, description_ar, price_piastres, stock_quantity, active, display_order)
 values
-  ('taiwan',  'تايوان يا ريس',        'كاب مطرّز بعبارة «تايوان يا ريس».',  95000, 20, false, 1),
-  ('al-adou', 'العدو ليس بهذه القوة', 'كاب مطرّز بإحدى أشهر عبارات طاهر.', 95000, 20, false, 2)
+  ('taiwan',  'تايوان يا ريس',        'كاب مطرّز بعبارة «تايوان يا ريس».',  95000, 10, false, 1),
+  ('al-adou', 'العدو ليس بهذه القوة', 'كاب مطرّز بإحدى أشهر عبارات طاهر.', 95000, 10, false, 2)
 on conflict (slug) do nothing;
 
 -- Photography.
