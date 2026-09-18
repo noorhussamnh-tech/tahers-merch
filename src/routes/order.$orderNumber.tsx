@@ -26,7 +26,7 @@ import type { PaymentStatus, PlacedOrder } from "@/lib/domain/types";
 export const Route = createFileRoute("/order/$orderNumber")({
   head: () => ({
     meta: [
-      { title: "Your order | Taher Caps" },
+      { title: "Your order | Taher's Merch" },
       // Never indexed: the URL contains an order number.
       { name: "robots", content: "noindex, nofollow" },
     ],

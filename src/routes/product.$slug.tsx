@@ -27,7 +27,7 @@ export const Route = createFileRoute("/product/$slug")({
   head: ({ params }) => {
     if (!isProductSlug(params.slug)) return {};
     const content = productContent(params.slug);
-    const title = `${content.name} | Taher Caps`;
+    const title = `${content.name} | Taher's Merch`;
 
     return {
       meta: [

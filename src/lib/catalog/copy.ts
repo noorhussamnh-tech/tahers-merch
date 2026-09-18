@@ -34,11 +34,16 @@ export const UI = {
   remove: "REMOVE",
 } as const;
 
-/** The homepage hero. */
+/**
+ * The homepage hero.
+ *
+ * `الإصدار الأول` is the headline itself, not a label above one -- so there is
+ * no eyebrow here. The announcement strip above the header deliberately does
+ * NOT repeat it, or the same three words would appear twice within 200px.
+ */
 export const HERO = {
-  label: "الإصدار الأول",
-  headline: "كابات طاهر",
-  supporting: "تصميمان من أشهر عبارات طاهر، متاحان بكمية محدودة.",
+  headline: "الإصدار الأول",
+  supporting: "مش عامله لأمي",
   cta: UI.shopTheCaps,
 } as const;
 
@@ -91,6 +96,10 @@ export const CART_EMPTY = {
 } as const;
 
 export const BRAND = {
-  /** Stays in English everywhere, including inside RTL sections. */
-  name: "Taher Caps",
+  /**
+   * Stays in English everywhere, including inside RTL sections, and is set in
+   * the heavy italic display face -- the one piece of the page allowed real
+   * flourish.
+   */
+  name: "Taher's Merch",
 } as const;

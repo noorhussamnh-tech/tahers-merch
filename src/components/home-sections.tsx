@@ -38,11 +38,11 @@ export function Hero() {
             photograph leads -- but first in the source on a phone would put
             the words above the cap, so the order is flipped there. */}
         <div lang="ar" dir="rtl" className="order-2 text-right lg:order-1">
-          <p className="eyebrow-ar">{HERO.label}</p>
+          {/* No eyebrow: the headline IS الإصدار الأول, and a label saying the
+              same thing above it would be the phrase twice in one panel. */}
+          <h1 className="phrase font-arabic text-display font-semibold">{HERO.headline}</h1>
 
-          <h1 className="phrase mt-4 font-arabic text-display font-semibold">{HERO.headline}</h1>
-
-          <p className="mt-5 font-arabic text-lg leading-8 text-muted sm:text-xl">
+          <p className="mt-5 font-arabic text-xl leading-9 text-muted sm:text-2xl">
             {HERO.supporting}
           </p>
 
@@ -153,7 +153,7 @@ export function SiteFooter() {
     <footer className="border-t border-border bg-foreground px-5 py-14 text-background sm:px-8">
       <div className="mx-auto grid max-w-page gap-10 md:grid-cols-3">
         <div>
-          <p className="font-display text-2xl sm:text-3xl">{BRAND.name}</p>
+          <p className="wordmark text-2xl sm:text-3xl">{BRAND.name}</p>
         </div>
 
         <div className="font-mono text-xs text-background/55">

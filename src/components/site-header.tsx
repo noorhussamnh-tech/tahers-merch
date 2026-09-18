@@ -2,12 +2,12 @@
  * The header.
  *
  * Two bars, following the supplied design: a thin dark announcement strip in
- * Arabic across the top, then the header proper -- serif logo left, mono
- * navigation, cart right with a signal-red count.
+ * Arabic across the top, then the header proper -- the italic wordmark left,
+ * mono navigation, cart right with a signal-red count.
  *
- * The announcement strip is the one place the page inverts, and it is what
- * gives the top of the site its edge. It is deliberately small and says one
- * true thing: this is the first release, and the quantity is limited.
+ * The strip is the one place the page inverts, and it is what gives the top of
+ * the site its edge. It says one true thing and deliberately does NOT repeat
+ * the hero headline sitting just below it.
  *
  * On a phone the navigation becomes a slide-out panel. No mega-menu: there are
  * four links.
@@ -50,15 +50,15 @@ export function SiteHeader() {
         dir="rtl"
         className="border-b border-border bg-foreground px-4 py-2 text-center font-arabic text-[11px] text-background"
       >
-        الإصدار الأول · كمية محدودة
+        كمية محدودة
       </div>
 
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-page items-center justify-between gap-5 px-5 sm:px-8 lg:h-20 lg:gap-12">
-          {/* Logo: the serif, always English. */}
+          {/* The wordmark. Heavy italic, always English, even in RTL. */}
           <Link
             to="/"
-            className="truncate font-display text-xl leading-none sm:text-2xl lg:text-3xl"
+            className="wordmark truncate text-xl leading-none sm:text-2xl lg:text-[1.75rem]"
           >
             {BRAND.name}
           </Link>
@@ -147,7 +147,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
         )}
       >
         <div className="flex items-center justify-between">
-          <span className="font-display text-xl">{BRAND.name}</span>
+          <span className="wordmark text-xl">{BRAND.name}</span>
           <button
             type="button"
             onClick={onClose}

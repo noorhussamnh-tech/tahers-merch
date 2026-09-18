@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/track")({
   head: () => ({
     meta: [
-      { title: "Track your order | Taher Caps" },
+      { title: "Track your order | Taher's Merch" },
       { name: "description", content: "تتبّع طلبك برقم الطلب ورقم الموبايل." },
       { name: "robots", content: "noindex, nofollow" },
     ],

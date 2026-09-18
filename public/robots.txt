@@ -1,4 +1,4 @@
-# Taher Caps
+# Taher's Merch
 #
 # The shop is two product pages and a homepage. Everything to do with an order
 # is disallowed: those URLs carry order numbers and personal details, and none

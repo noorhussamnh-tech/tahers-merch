@@ -27,15 +27,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#F5F0E6" },
       // The default title and description are Arabic: the shop's audience
       // reads Arabic, and this is what a share card shows.
-      { title: "كابات طاهر | Taher Caps" },
+      { title: "الإصدار الأول | Taher's Merch" },
       {
         name: "description",
         content: "تصميمان من أشهر عبارات طاهر، متاحان بكمية محدودة.",
       },
-      { property: "og:site_name", content: "Taher Caps" },
+      { property: "og:site_name", content: "Taher's Merch" },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "ar_EG" },
-      { property: "og:title", content: "كابات طاهر | Taher Caps" },
+      { property: "og:title", content: "الإصدار الأول | Taher's Merch" },
       {
         property: "og:description",
         content: "تصميمان من أشهر عبارات طاهر، متاحان بكمية محدودة.",
@@ -54,7 +54,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         // The four families the design uses, only the weights actually used.
         // `display=swap` so the Arabic renders in a fallback rather than not
         // at all while the serif loads.
-        href: "https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Manrope:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,900&family=Libre+Baskerville:wght@400;700&family=Manrope:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap",
       },
     ],
   }),

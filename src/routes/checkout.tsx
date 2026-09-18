@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
-      { title: "Checkout | Taher Caps" },
+      { title: "Checkout | Taher's Merch" },
       // A checkout page has nothing to offer a search engine and should never
       // appear in one.
       { name: "robots", content: "noindex, nofollow" },

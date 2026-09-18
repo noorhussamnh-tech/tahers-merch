@@ -49,7 +49,14 @@
   --color-accent: var(--color-signal);
 
   /* --- Faces ------------------------------------------------------------- */
-  /* Logo and editorial headings. High contrast, a little bookish. */
+  /*
+   * The logo, and only the logo. Playfair Display at 900 italic: heavy, high
+   * contrast, and slanted hard. It carries the whole brand's personality in
+   * one word, which is why nothing else on the page is allowed to be italic --
+   * a flourish that appears twice stops being a flourish.
+   */
+  --font-logo: "Playfair Display", Georgia, serif;
+  /* Editorial headings. High contrast, a little bookish. */
   --font-display: "Libre Baskerville", Georgia, serif;
   /* Running text and form controls. */
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
@@ -147,6 +154,17 @@
 }
 
 @layer components {
+  /*
+   * The wordmark. Black weight, italic, tightened -- at 900 the default
+   * letter spacing reads loose, and a logo should sit as one shape.
+   */
+  .wordmark {
+    font-family: var(--font-logo);
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: -0.02em;
+  }
+
   /*
    * The label. Mono, tiny, letterspaced hard, uppercase for English. This is
    * the design's signature and it appears on navigation, prices, status chips

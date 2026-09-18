@@ -34,7 +34,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
-    meta: [{ title: "Admin | Taher Caps" }, { name: "robots", content: "noindex, nofollow" }],
+    meta: [{ title: "Admin | Taher's Merch" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: AdminPage,
 });
