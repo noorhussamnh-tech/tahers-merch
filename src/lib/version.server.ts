@@ -21,8 +21,29 @@ export interface VersionInfo {
   /** "production" for the live site, "preview" for a branch deployment. */
   readonly environment: string;
   readonly region: string;
+  /**
+   * Whether new-order notifications are switched on in THIS deployment.
+   *
+   * Answers a question that otherwise has no answer short of placing a real
+   * order: the keys are set in Vercel, they are baked in at deploy time, and
+   * adding them without redeploying changes nothing. This says what the
+   * running code can actually see.
+   *
+   * It reports only whether the values are present -- never any part of them.
+   */
+  readonly orderNotifications: "email" | "email+telegram" | "telegram" | "off";
+
   /** When this request was served -- proof the answer is not itself cached. */
   readonly now: string;
+}
+
+function notificationChannels(): VersionInfo["orderNotifications"] {
+  const email = Boolean(envOr("RESEND_API_KEY", "") && envOr("ORDER_NOTIFICATION_EMAIL", ""));
+  const telegram = Boolean(envOr("TELEGRAM_BOT_TOKEN", "") && envOr("TELEGRAM_CHAT_ID", ""));
+  if (email && telegram) return "email+telegram";
+  if (email) return "email";
+  if (telegram) return "telegram";
+  return "off";
 }
 
 /**
@@ -44,6 +65,7 @@ export function versionInfo(): VersionInfo {
     branch: envOr("VERCEL_GIT_COMMIT_REF", "unknown"),
     environment: envOr("VERCEL_ENV", "local"),
     region: envOr("VERCEL_REGION", "local"),
+    orderNotifications: notificationChannels(),
     now: new Date().toISOString(),
   };
 }

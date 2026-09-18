@@ -152,10 +152,15 @@ problems become expensive ones.
 Be honest with yourself about these. They are the gap between "it works" and
 "it is safe to promote."
 
-- **Nothing notifies you of a new order.** The email is built but not switched
-  on — it needs one key pasted into Vercel, about five minutes. Until then,
-  section 3 is the only thing standing between an order and being ignored.
-  **Switch this on before any announcement, not after.**
+- **Order notifications.** Check whether they are on by opening `/api/version`
+  on the site and reading `orderNotifications`. `"off"` means nothing will tell
+  you an order arrived and section 3 is the only thing between an order and
+  being ignored; `"email"` means it is working. **Switch it on before any
+  announcement, not after.**
+
+  If you have pasted the keys into Vercel and it still says `"off"`: keys are
+  read when the site is published, not when they are saved. Vercel →
+  Deployments → the top one → ⋯ → **Redeploy**, then check again.
 - **No card payments.** Cash on delivery only. Paymob is built and waiting for
   an account.
 - **Delivery is Cairo and Giza.** The site says so. Make sure the database

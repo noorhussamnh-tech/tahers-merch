@@ -88,8 +88,9 @@ builds with npm.
 curl https://<your-site>/api/version
 ```
 
-Answers with the commit the deployed site was built from, its branch, and the
-moment it replied. It reads Vercel's own variables at request time, is never
+Answers with the commit the deployed site was built from, its branch, whether
+order notifications are switched on (`orderNotifications`), and the moment it
+replied. It reads Vercel's own variables at request time, is never
 cached, and echoes nothing else from the environment.
 
 Use it whenever a change "isn't showing". If the commit it reports is not the

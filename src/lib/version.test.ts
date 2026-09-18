@@ -44,3 +44,38 @@ describe("versionResponse", () => {
     expect(body).not.toContain("must-not-appear");
   });
 });
+
+describe("orderNotifications", () => {
+  it("is off when nothing is configured", () => {
+    vi.stubEnv("RESEND_API_KEY", "");
+    vi.stubEnv("ORDER_NOTIFICATION_EMAIL", "");
+    vi.stubEnv("TELEGRAM_BOT_TOKEN", "");
+    vi.stubEnv("TELEGRAM_CHAT_ID", "");
+    expect(versionInfo().orderNotifications).toBe("off");
+  });
+
+  it("needs BOTH the key and a recipient before it claims email works", () => {
+    // A key with nowhere to send is the exact trap this is meant to catch.
+    vi.stubEnv("RESEND_API_KEY", "re_xxx");
+    vi.stubEnv("ORDER_NOTIFICATION_EMAIL", "");
+    vi.stubEnv("TELEGRAM_BOT_TOKEN", "");
+    vi.stubEnv("TELEGRAM_CHAT_ID", "");
+    expect(versionInfo().orderNotifications).toBe("off");
+  });
+
+  it("reports email once both are set", () => {
+    vi.stubEnv("RESEND_API_KEY", "re_xxx");
+    vi.stubEnv("ORDER_NOTIFICATION_EMAIL", "orders@example.com");
+    vi.stubEnv("TELEGRAM_BOT_TOKEN", "");
+    vi.stubEnv("TELEGRAM_CHAT_ID", "");
+    expect(versionInfo().orderNotifications).toBe("email");
+  });
+
+  it("never puts any part of a key in the response", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_secret_must_not_appear");
+    vi.stubEnv("ORDER_NOTIFICATION_EMAIL", "orders@example.com");
+    const body = await versionResponse().text();
+    expect(body).not.toContain("must_not_appear");
+    expect(body).not.toContain("orders@example.com");
+  });
+});
