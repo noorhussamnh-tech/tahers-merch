@@ -10,6 +10,7 @@
  * Supabase account that is not on that list gets you a page that says so, and
  * every function behind it would refuse you anyway.
  */
+import { Download } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -27,6 +28,7 @@ import {
   type AdminZone,
 } from "@/lib/admin/api";
 import { Button } from "@/components/ui/button";
+import { downloadOrdersCsv } from "@/lib/admin/csv";
 import { FULFILMENT_FLOW, type FulfilmentStatus } from "@/lib/domain/types";
 import { formatEGP, piastresToPounds, poundsToPiastres } from "@/lib/domain/money";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
@@ -385,24 +387,44 @@ function OrdersPanel() {
 
   return (
     <div className="flex flex-col gap-6">
-      <form
-        className="flex gap-2"
-        onSubmit={(event) => {
-          event.preventDefault();
-          reload();
-        }}
-      >
-        <input
-          aria-label="Search orders"
-          placeholder="Order number or mobile number"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="h-11 w-full max-w-sm border border-border bg-background px-3 font-sans text-sm text-foreground outline-none focus:border-signal"
-        />
-        <Button type="submit" size="sm" variant="outline" className="h-11" disabled={busy}>
-          Search
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <form
+          className="flex gap-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            reload();
+          }}
+        >
+          <input
+            aria-label="Search orders"
+            placeholder="Order number or mobile number"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="h-11 w-full max-w-sm border border-border bg-background px-3 font-sans text-sm text-foreground outline-none focus:border-signal"
+          />
+          <Button type="submit" size="sm" variant="outline" className="h-11" disabled={busy}>
+            Search
+          </Button>
+        </form>
+
+        {/* Exports exactly what is on screen, so a search narrows the file
+            too -- "today's Cairo orders" is a search away from being its own
+            CSV. */}
+        <Button
+          type="button"
+          size="sm"
+          className="h-11"
+          disabled={!orders || orders.length === 0}
+          onClick={() => {
+            if (!orders?.length) return;
+            downloadOrdersCsv(orders);
+            toast.success(`Exported ${orders.length} order${orders.length === 1 ? "" : "s"}.`);
+          }}
+        >
+          <Download className="h-4 w-4" aria-hidden />
+          Export CSV
         </Button>
-      </form>
+      </div>
 
       {!orders ? (
         <p className="font-sans text-sm text-muted">Loading…</p>

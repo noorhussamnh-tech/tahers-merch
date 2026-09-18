@@ -18,6 +18,7 @@ import { getServiceClient, toApiError } from "@/lib/supabase/service.server";
 import { ApiError } from "@/lib/errors";
 import { checkoutSchema, type CheckoutInput } from "@/lib/domain/validation";
 import { createIntention, paymobConfigured } from "@/lib/paymob/client.server";
+import { notifyNewOrder } from "@/lib/notify/telegram.server";
 import { siteUrl } from "@/lib/supabase/config";
 import type { PlacedOrder, PricedLine } from "@/lib/domain/types";
 
@@ -165,6 +166,23 @@ export const placeOrder = createServerFn({ method: "POST" })
       address: order.address,
       customerName: order.customerName,
     };
+
+    /*
+     * Tell whoever is packing. Deliberately not awaited: a notification must
+     * never sit in the customer's critical path, and `notifyNewOrder` swallows
+     * its own errors, so a Telegram outage cannot fail a checkout that has
+     * already reserved stock and written an order.
+     */
+    void notifyNewOrder({
+      orderNumber: order.orderNumber,
+      customerName: order.customerName,
+      customerMobile: data.customer.mobile,
+      governorate: data.address.governorate,
+      city: data.address.city,
+      total: order.total,
+      paymentMethod: data.paymentMethod,
+      lines: order.lines.map((line) => ({ name: line.name, quantity: line.quantity })),
+    });
 
     if (data.paymentMethod === "cod") return placed;
 
