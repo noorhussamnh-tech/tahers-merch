@@ -57,7 +57,7 @@ const footer = `
 --    Authentication -> Users -> Add user (tick "Auto Confirm User"), then run:
 --
 --      insert into tc_admins (auth_user_id, email)
---      select id, email from auth.users where email = 'you@kijamii.com';
+--      select id, email from auth.users where email = 'you@example.com';
 --
 -- 2. Turn OFF public sign-ups:
 --    Authentication -> Providers -> Email -> untick "Enable sign-ups".
