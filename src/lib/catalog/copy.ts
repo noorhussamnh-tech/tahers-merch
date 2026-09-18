@@ -11,17 +11,17 @@
  */
 
 /**
- * Header navigation. Deliberately empty.
+ * Header navigation. English, never translated.
  *
- * The site is one page with two products on it; there was nothing to navigate
- * to that scrolling does not reach. The header is now the wordmark and the
- * cart, and nothing else.
- *
- * TRACK ORDER and FAQ still live in the footer -- a customer chasing an order
- * needs a way in, and the order confirmation links there directly. Putting a
- * link back here is a matter of adding an entry to this array.
+ * Three links to the three sections of the one page. TRACK ORDER is
+ * deliberately not here -- it lives in the footer and on the order
+ * confirmation, which is where somebody chasing a parcel actually looks.
  */
-export const NAV: readonly { label: string; to: "/" | "/track"; hash?: string }[] = [];
+export const NAV: readonly { label: string; to: "/" | "/track"; hash?: string }[] = [
+  { label: "SHOP", to: "/", hash: "shop" },
+  { label: "ABOUT", to: "/", hash: "about" },
+  { label: "FAQ", to: "/", hash: "faq" },
+];
 
 /** English functional labels, fixed by the brief. */
 export const UI = {
@@ -63,34 +63,39 @@ export const ABOUT = {
   closing: "هذا كل شيء.",
 } as const;
 
-/** Questions in English, answers in Arabic, exactly as specified. */
+/**
+ * FAQ. Questions and answers both in English.
+ *
+ * Answers were Arabic originally; they are English now at the client's
+ * instruction, which also means this whole section reads left to right.
+ *
+ * Two answers carry real operational commitments. Change them only alongside
+ * the thing they promise:
+ *
+ *   · `delivery` says Cairo only. If a shipping zone exists for anywhere else,
+ *     checkout will happily take that order and this answer becomes a lie.
+ *     The zones are the source of truth -- see docs/MISSING-INFORMATION.md.
+ *   · `returns` says at-the-door only, delivery paid either way. That is a
+ *     policy, not a description, and it is what a customer will hold you to.
+ */
 export const FAQ = [
-  {
-    id: "adjustable",
-    question: "IS THE CAP ADJUSTABLE?",
-    answer: "نعم، الكاب بمقاس قابل للتعديل.",
-  },
   {
     id: "material",
     question: "WHAT MATERIAL IS IT MADE FROM?",
-    // Placeholder by instruction. Replace only once the manufacturer confirms
-    // the material -- see docs/MISSING-INFORMATION.md.
-    answer: "سيتم إضافة تفاصيل الخامة بعد تأكيدها.",
+    // Still a placeholder: the manufacturer has not confirmed the composition.
+    answer: "Material details will be added once confirmed by the manufacturer.",
   },
   {
     id: "delivery",
     question: "HOW LONG DOES DELIVERY TAKE?",
-    answer: "تختلف مدة التوصيل حسب المحافظة، وستظهر المدة المتوقعة عند إتمام الطلب.",
+    answer:
+      "We currently deliver within Cairo only. The expected delivery time is shown at checkout before you place your order.",
   },
   {
     id: "returns",
     question: "CAN I EXCHANGE OR RETURN IT?",
-    answer: "يمكن طلب الاستبدال أو الاسترجاع وفقًا للشروط الموضحة في سياسة المتجر.",
-  },
-  {
-    id: "quantity",
-    question: "IS THE QUANTITY LIMITED?",
-    answer: "نعم، يتوفر كل تصميم بكمية محدودة.",
+    answer:
+      "Exchanges and returns are accepted while the courier is still at your door, and not after. Delivery fees are payable in all cases.",
   },
 ] as const;
 

@@ -112,8 +112,7 @@ export function AboutSection() {
 }
 
 /**
- * FAQ. Questions in English, answers in Arabic -- each answer gets its own
- * RTL block so the two directions do not fight inside one row.
+ * FAQ. English throughout now, so the whole section reads left to right.
  *
  * Built on <details> rather than a JavaScript accordion: it works before
  * hydration, it is keyboard accessible for free, and the answers are in the
@@ -137,7 +136,7 @@ export function FaqSection() {
                   +
                 </span>
               </summary>
-              <p dir="rtl" className="pb-7 text-right font-arabic text-lg leading-9 text-muted">
+              <p className="max-w-3xl pb-7 font-sans text-base leading-7 text-muted">
                 {entry.answer}
               </p>
             </details>
