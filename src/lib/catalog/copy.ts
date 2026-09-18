@@ -56,38 +56,35 @@ export const SHOP = {
 } as const;
 
 /**
- * FAQ. Questions and answers both in English.
+ * FAQ. Two questions, English throughout, so the section reads left to right.
  *
- * Answers were Arabic originally; they are English now at the client's
- * instruction, which also means this whole section reads left to right.
+ * Both answers are operational commitments rather than descriptions, and both
+ * are things a customer will hold the shop to. Change either only alongside
+ * the thing it promises:
  *
- * Two answers carry real operational commitments. Change them only alongside
- * the thing they promise:
+ *   · `delivery` says Cairo and Giza only. The shipping zones are what
+ *     actually enforce that -- a governorate with a row in tc_shipping_zones
+ *     can be ordered to, whatever this answer says. If the two disagree, the
+ *     zones win and this becomes a lie.
+ *   · `returns` says at-the-door only, delivery paid either way. That is the
+ *     policy, and it is the one customers argue about.
  *
- *   · `delivery` says Cairo only. If a shipping zone exists for anywhere else,
- *     checkout will happily take that order and this answer becomes a lie.
- *     The zones are the source of truth -- see docs/MISSING-INFORMATION.md.
- *   · `returns` says at-the-door only, delivery paid either way. That is a
- *     policy, not a description, and it is what a customer will hold you to.
+ * Questions about the cap itself -- whether it adjusts, what it is made of --
+ * were removed deliberately. Nothing here should exist that the business
+ * cannot yet answer honestly.
  */
 export const FAQ = [
-  {
-    id: "material",
-    question: "WHAT MATERIAL IS IT MADE FROM?",
-    // Still a placeholder: the manufacturer has not confirmed the composition.
-    answer: "Material details will be added once confirmed by the manufacturer.",
-  },
   {
     id: "delivery",
     question: "HOW LONG DOES DELIVERY TAKE?",
     answer:
-      "We currently deliver within Cairo only. The expected delivery time is shown at checkout before you place your order.",
+      "We currently ship to Cairo and Giza only. The expected delivery time is shown at checkout before you place your order.",
   },
   {
     id: "returns",
     question: "CAN I EXCHANGE OR RETURN IT?",
     answer:
-      "Exchanges and returns are accepted while the courier is still at your door, and not after. Delivery fees are payable in all cases.",
+      "Exchanges and returns are only possible while the courier is still at your door. Delivery fees apply in all cases.",
   },
 ] as const;
 
