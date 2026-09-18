@@ -43,7 +43,7 @@ export const UI = {
  */
 export const HERO = {
   headline: "الإصدار الأول",
-  supporting: "مش عامله لأمي",
+  supporting: "برضو مش عامله لأمي",
   cta: UI.shopTheCaps,
 } as const;
 
