@@ -11,7 +11,7 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
-import { ABOUT, BRAND, FAQ, HERO, SHOP, UI } from "@/lib/catalog/copy";
+import { BRAND, FAQ, HERO, SHOP, UI } from "@/lib/catalog/copy";
 import { Button } from "@/components/ui/button";
 import { ProductImage } from "@/components/product-image";
 import { PRODUCT_CONTENT, mainImage, productContent } from "@/lib/catalog/products";
@@ -94,24 +94,6 @@ export function ShopHeading() {
 }
 
 /**
- * About. Short by instruction: no founder story, no brand philosophy, no
- * manifesto. Large type and a lot of room around very few words.
- */
-export function AboutSection() {
-  return (
-    <section id="about" className="scroll-mt-28 border-y border-border">
-      <div className="mx-auto max-w-page px-5 py-20 sm:px-8 lg:py-28">
-        <div dir="rtl" className="mx-auto flex max-w-3xl flex-col gap-8 text-right">
-          <h2 className="phrase font-arabic text-headline font-semibold">{ABOUT.heading}</h2>
-          <p className="font-arabic text-xl leading-9 text-muted">{ABOUT.body}</p>
-          <p className="font-arabic text-lg">{ABOUT.closing}</p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/**
  * FAQ. English throughout now, so the whole section reads left to right.
  *
  * Built on <details> rather than a JavaScript accordion: it works before
@@ -120,7 +102,7 @@ export function AboutSection() {
  */
 export function FaqSection() {
   return (
-    <section id="faq" className="scroll-mt-28">
+    <section id="faq" className="scroll-mt-28 border-t border-border">
       <div className="mx-auto max-w-page px-5 py-20 sm:px-8 lg:py-28">
         <h2 className="font-display text-headline">FAQ</h2>
 

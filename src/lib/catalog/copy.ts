@@ -19,7 +19,6 @@
  */
 export const NAV: readonly { label: string; to: "/" | "/track"; hash?: string }[] = [
   { label: "SHOP", to: "/", hash: "shop" },
-  { label: "ABOUT", to: "/", hash: "about" },
   { label: "FAQ", to: "/", hash: "faq" },
 ];
 
@@ -54,13 +53,6 @@ export const HERO = {
 
 export const SHOP = {
   heading: "التصميمان",
-} as const;
-
-/** The about section. Short by instruction: no founder story, no philosophy. */
-export const ABOUT = {
-  heading: "من كلام طاهر",
-  body: "عبارات ارتبطت بمحتوى طاهر وبقيت مع جمهوره. تحوّلت هنا إلى تصميمين بسيطين، متاحين بكمية محدودة.",
-  closing: "هذا كل شيء.",
 } as const;
 
 /**

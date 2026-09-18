@@ -12,11 +12,11 @@
  * then the muted line, then the aside as a caption on the photograph -- the
  * aside is never a headline.
  */
+import { Plus } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ProductGallery } from "@/components/product-gallery";
-import { QuantityStepper } from "@/components/cart-drawer";
 import { UI } from "@/lib/catalog/copy";
 import { formatEGP } from "@/lib/domain/money";
 import { productContent, type ProductSlug } from "@/lib/catalog/products";
@@ -131,7 +131,6 @@ function BuyPanel({
   sticky: boolean;
 }) {
   const cart = useCart();
-  const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
   if (!product) {
@@ -150,7 +149,9 @@ function BuyPanel({
   const priceUnset = product.price <= 0;
 
   const handleAdd = () => {
-    cart.add(slug, quantity);
+    // One at a time. More than one is a change the customer makes in the cart,
+    // where they can see what they are committing to.
+    cart.add(slug, 1);
     cart.open();
     setAdded(true);
     window.setTimeout(() => setAdded(false), 2000);
@@ -171,23 +172,28 @@ function BuyPanel({
         </p>
       ) : (
         <>
-          <div className="flex flex-wrap items-center gap-4">
-            <QuantityStepper
-              value={quantity}
-              max={Math.max(product.available, 1)}
-              onChange={(next) => setQuantity(Math.max(next, 1))}
-              label={name}
-            />
-
-            <Button
-              size="lg"
-              variant="signal"
+          {/*
+           * Quick add: a black square with a white plus, as the design has it.
+           * One tap puts a cap in the cart and opens the drawer, where the
+           * quantity can be changed -- which is why there is no stepper here.
+           * Wider than a bare icon so the label reads on a desktop and the tap
+           * target stays comfortable on a phone.
+           */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
               onClick={handleAdd}
               disabled={soldOut}
-              className="min-w-[12rem] flex-1"
+              aria-label={`${UI.addToCart}: ${name}`}
+              className={cn(
+                "group flex h-12 items-center gap-3 bg-foreground px-4 text-background",
+                "transition-colors hover:bg-signal",
+                "disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-foreground",
+              )}
             >
-              {soldOut ? UI.soldOut : added ? "Added" : UI.addToCart}
-            </Button>
+              <Plus className="h-5 w-5 shrink-0" strokeWidth={2.5} aria-hidden />
+              <span className="label">{soldOut ? UI.soldOut : added ? "Added" : UI.addToCart}</span>
+            </button>
           </div>
 
           {/* The sticky bar a phone gets on the product detail view, so the
@@ -195,7 +201,7 @@ function BuyPanel({
           {sticky && !soldOut && (
             <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background px-5 py-3 lg:hidden">
               <Button size="lg" variant="signal" onClick={handleAdd} className="w-full">
-                {added ? "Added" : `${UI.addToCart} — ${formatEGP(product.price * quantity)}`}
+                {added ? "Added" : `${UI.addToCart} — ${formatEGP(product.price)}`}
               </Button>
             </div>
           )}

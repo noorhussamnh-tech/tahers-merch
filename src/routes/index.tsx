@@ -7,13 +7,7 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 
-import {
-  AboutSection,
-  FaqSection,
-  Hero,
-  ShopHeading,
-  SiteFooter,
-} from "@/components/home-sections";
+import { FaqSection, Hero, ShopHeading, SiteFooter } from "@/components/home-sections";
 import { PRODUCT_CONTENT } from "@/lib/catalog/products";
 import { ProductSection } from "@/components/product-section";
 import { Route as RootRoute } from "./__root";
@@ -49,7 +43,6 @@ function HomePage() {
         ))}
       </section>
 
-      <AboutSection />
       <FaqSection />
       <SiteFooter />
 
