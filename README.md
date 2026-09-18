@@ -60,12 +60,16 @@ only thing left is to activate the caps in `/admin` when you mean to open. See
 | `node scripts/build-setup-sql.mjs` | Regenerate the one-paste `supabase/setup.sql` from the migrations |
 | `node scripts/optimize-images.mjs` | Turn supplied photographs into the AVIF/WebP variants |
 
-Bun, not npm, and not a preference: `npm install` cannot install this project.
-npm 10's resolver crashes on vitest's peer dependencies — `Cannot read
-properties of null (reading 'edgesOut')` — before it installs anything. The
-lockfile here is `bun.lock`, there is no `package-lock.json`, and one cannot be
-generated until npm can resolve the tree. Vercel is pointed at bun for the same
-reason.
+**Do not delete `package-lock.json`.** Without it, `npm install` resolves the
+dependency tree from scratch, and npm 10 crashes doing that here — `Cannot read
+properties of null (reading 'edgesOut')`, thrown while working out vitest's
+peer dependencies, before anything is installed. With the lockfile present, npm
+reads it instead of resolving, and is fine. If it ever has to be rebuilt,
+generate it with `npm install --legacy-peer-deps`, which skips the resolution
+that crashes.
+
+`bun.lock` is here too and bun is what these commands assume locally; Vercel
+builds with npm.
 
 ### Which build is live
 
