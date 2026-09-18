@@ -60,6 +60,17 @@ only thing left is to activate the caps in `/admin` when you mean to open. See
 | `node scripts/build-setup-sql.mjs` | Regenerate the one-paste `supabase/setup.sql` from the migrations |
 | `node scripts/optimize-images.mjs` | Turn supplied photographs into the AVIF/WebP variants |
 
+### Deployment notes
+
+Two things about this project will break Vercel if they are undone, and
+neither is visible from a local build:
+
+**`vercel.json` must contain only keys Vercel knows.** It is validated against
+a schema, and an unknown top-level key — including a `"//"` used as a comment,
+the way `package.json` allows — fails the deployment before the build starts.
+Every note that wants to live near that file lives here instead. `vite build`
+never reads `vercel.json`, so a local build cannot catch this.
+
 **Do not delete `package-lock.json`.** Without it, `npm install` resolves the
 dependency tree from scratch, and npm 10 crashes doing that here — `Cannot read
 properties of null (reading 'edgesOut')`, thrown while working out vitest's
