@@ -2,24 +2,27 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
 
   "//": [
-    "Bun, not npm, and deliberately.",
+    "npm, and do not change it to bun without proving it on a deployment.",
     "",
-    "`npm install` cannot install this project at all. npm 10's dependency",
-    "resolver crashes -- `Cannot read properties of null (reading 'edgesOut')`",
-    "-- while working out vitest's peer dependencies, and it crashes before",
-    "installing anything, so the build never starts. It is an npm bug, not a",
-    "bad dependency: bun installs the same package.json in under a second.",
+    "This was switched to bun once and every deployment failed from that",
+    "commit until it was switched back. Vercel builds npm here perfectly well",
+    "-- it had been doing so all along -- and the failure it was meant to fix",
+    "was never Vercel's: `npm install` crashes on THIS machine with npm 10",
+    "('Cannot read properties of null (reading edgesOut)') while resolving",
+    "vitest's peer dependencies. Locally, use bun. Vercel uses npm.",
     "",
-    "The lockfile in the repository is bun.lock. There is no package-lock.json",
-    "and there cannot be one until npm can resolve the tree, so pointing Vercel",
-    "at npm means pointing it at a command that fails every time.",
+    "The cost of that is real and worth knowing: there is no",
+    "package-lock.json, and there cannot be one until npm can resolve the tree",
+    "locally, so Vercel resolves dependencies fresh on every build. A bad",
+    "release of any transitive dependency can therefore break a build without",
+    "anything here changing. If that ever happens, the symptom is a build that",
+    "fails while the site keeps serving the last good one.",
     "",
-    "If this is ever moved back to npm, generate a working package-lock.json",
-    "FIRST and check that a clean clone installs from it."
+    "Whoever fixes that properly: get a working package-lock.json committed."
   ],
 
-  "installCommand": "bun install",
-  "buildCommand": "bun run build",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
 
   "framework": null,
   "github": { "silent": true }
