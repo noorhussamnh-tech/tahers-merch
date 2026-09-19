@@ -1416,7 +1416,7 @@ grant execute on function tc_is_admin() to authenticated;
 insert into tc_products (slug, name_ar, description_ar, price_piastres, stock_quantity, active, display_order)
 values
   ('taiwan',  'تايوان يا ريس',        'كاب مطرّز بعبارة «تايوان يا ريس».',  95000, 10, false, 1),
-  ('al-adou', 'العدو ليس بهذه القوة', 'كاب مطرّز بإحدى أشهر عبارات طاهر.', 95000, 10, false, 2)
+  ('al-adou', 'العدو ليس بهذه القوة', 'كاب مطرّز بعبارة «العدو ليس بهذه القوة ونحن لسنا بهذا الضعف».', 95000, 10, false, 2)
 on conflict (slug) do nothing;
 
 -- Photography.

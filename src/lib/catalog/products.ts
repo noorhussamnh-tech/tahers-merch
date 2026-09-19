@@ -183,7 +183,7 @@ const AL_ADOU: ProductContent = {
   // under the product name.
   secondaryPhrase: "ونحن لسنا بهذا الضعف.",
   fullPhrase: "العدو ليس بهذه القوة، ونحن لسنا بهذا الضعف.",
-  description: "كاب مطرّز بإحدى أشهر عبارات طاهر.",
+  description: "كاب مطرّز بعبارة «العدو ليس بهذه القوة ونحن لسنا بهذا الضعف».",
   colour: "نبيتي بتطريز لون الكريم",
   images: [
     photo(
