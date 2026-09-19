@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import {
+  confirmTransfer,
   isAdmin,
   listOrders,
   listProducts,
@@ -28,7 +29,13 @@ import {
   type AdminZone,
 } from "@/lib/admin/api";
 import { Button } from "@/components/ui/button";
-import { downloadOrdersCsv } from "@/lib/admin/csv";
+import {
+  downloadOrdersCsv,
+  orderDate,
+  orderTime,
+  paymentMethodLabel,
+  paymentStatusLabel,
+} from "@/lib/admin/csv";
 import { FULFILMENT_FLOW, type FulfilmentStatus } from "@/lib/domain/types";
 import { formatEGP, piastresToPounds, poundsToPiastres } from "@/lib/domain/money";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
@@ -189,8 +196,19 @@ function SignOutButton() {
 
 /* ------------------------------------------------------------- console */
 
+/**
+ * The tabs, in the order they are worked.
+ *
+ * "details" is a second view of the same orders rather than different data:
+ * the cards under "orders" are for acting on one order, this is for scanning
+ * all of them at once. Both exist because they answer different questions --
+ * "what do I do with this order" and "what is going on today".
+ */
+const ADMIN_TABS = ["products", "orders", "details", "shipping"] as const;
+type AdminTab = (typeof ADMIN_TABS)[number];
+
 function AdminConsole({ email }: { email: string }) {
-  const [tab, setTab] = useState<"products" | "orders" | "shipping">("products");
+  const [tab, setTab] = useState<AdminTab>("products");
 
   return (
     <div className="mx-auto max-w-page px-5 py-10 md:px-10 lg:px-16">
@@ -203,7 +221,7 @@ function AdminConsole({ email }: { email: string }) {
       </div>
 
       <nav className="mt-8 flex gap-6 border-b border-border">
-        {(["products", "orders", "shipping"] as const).map((name) => (
+        {ADMIN_TABS.map((name) => (
           <button
             key={name}
             type="button"
@@ -213,7 +231,7 @@ function AdminConsole({ email }: { email: string }) {
               tab === name ? "border-signal text-signal" : "border-transparent text-muted",
             )}
           >
-            {name}
+            {name === "details" ? "order details" : name}
           </button>
         ))}
       </nav>
@@ -221,6 +239,7 @@ function AdminConsole({ email }: { email: string }) {
       <div className="mt-10">
         {tab === "products" && <ProductsPanel />}
         {tab === "orders" && <OrdersPanel />}
+        {tab === "details" && <OrderDetailsPanel />}
         {tab === "shipping" && <ShippingPanel />}
       </div>
     </div>
@@ -442,6 +461,34 @@ function OrdersPanel() {
 function OrderCard({ order, onChanged }: { order: AdminOrder; onChanged: () => void }) {
   const [busy, setBusy] = useState(false);
 
+  /**
+   * Marks a transfer as received.
+   *
+   * Asks for the reference rather than taking the click alone: it is the only
+   * record of what the money was matched against, and "are we sure this one
+   * paid?" is a question that gets asked after the cap has already shipped.
+   * Cancelling the prompt cancels the confirmation -- a stray click must not
+   * mark an order paid.
+   */
+  async function confirmPayment() {
+    const reference = window.prompt(
+      `Confirm the Instapay transfer for ${order.orderNumber}?\n\n` +
+        "Paste the transfer reference from your bank app (recommended), or leave it blank.",
+    );
+    if (reference === null) return;
+
+    setBusy(true);
+    try {
+      await confirmTransfer(order.orderNumber, reference);
+      toast.success("Transfer confirmed. This order can be shipped.");
+      onChanged();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not confirm the transfer.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function move(status: FulfilmentStatus) {
     setBusy(true);
     try {
@@ -474,7 +521,7 @@ function OrderCard({ order, onChanged }: { order: AdminOrder; onChanged: () => v
                   : "bad"
             }
           >
-            {order.paymentMethod === "cod" ? "COD" : "Online"} · {order.paymentStatus}
+            {paymentMethodLabel(order)} · {paymentStatusLabel(order)}
           </Badge>
           <Badge tone={order.fulfilmentStatus === "cancelled" ? "bad" : "neutral"}>
             {order.fulfilmentStatus}
@@ -536,6 +583,38 @@ function OrderCard({ order, onChanged }: { order: AdminOrder; onChanged: () => v
         </p>
       )}
 
+      {/*
+        The one state in this panel that loses money if it is missed: the
+        customer said they would transfer and nobody has checked. It sits
+        directly above the shipping buttons on purpose -- that is where the
+        mistake would be made.
+      */}
+      {order.paymentMethod === "instapay" && order.paymentStatus !== "paid" && (
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border border-error/40 bg-background p-4">
+          <div>
+            <p className="font-sans text-sm text-error">Transfer not confirmed — do not ship.</p>
+            <p className="mt-1 font-sans text-xs text-muted">
+              Check your bank app for {formatEGP(order.total)} referencing {order.orderNumber}.
+            </p>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={busy}
+            onClick={confirmPayment}
+          >
+            Mark transfer received
+          </Button>
+        </div>
+      )}
+
+      {order.paymentReference && (
+        <p className="mt-3 font-sans text-xs text-muted">
+          Transfer reference {order.paymentReference}
+        </p>
+      )}
+
       <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-5">
         {FULFILMENT_FLOW.map((status) => (
           <button
@@ -590,6 +669,152 @@ function Badge({
       )}
     >
       {children}
+    </span>
+  );
+}
+
+/* -------------------------------------------------------- order details */
+
+/**
+ * Every order as one scannable table: date, time, who, where, and how they
+ * are paying.
+ *
+ * The cards under "orders" are for working a single order. This is for the
+ * question they cannot answer -- what is going on across all of them -- which
+ * is why it is a table and why it holds only the columns you would scan, not
+ * every field an order has.
+ *
+ * It scrolls sideways on a phone rather than wrapping. A table that reflows
+ * into stacked blocks stops being a table, and the whole value here is that
+ * the same field sits in the same place on every row.
+ */
+function OrderDetailsPanel() {
+  const [orders, setOrders] = useState<AdminOrder[] | null>(null);
+
+  const reload = useCallback(() => {
+    listOrders()
+      .then(setOrders)
+      .catch((error: Error) => toast.error(error.message));
+  }, []);
+
+  useEffect(reload, [reload]);
+
+  if (!orders) return <p className="font-sans text-sm text-muted">Loading…</p>;
+
+  if (orders.length === 0) {
+    return (
+      <div className="border border-border bg-card p-8 text-center">
+        <p className="font-sans text-sm text-foreground">No orders yet.</p>
+        <p className="mt-2 font-sans text-xs text-muted">
+          When the first one arrives it appears here, and the CSV button on the orders tab will have
+          something to export.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <p className="font-sans text-xs text-muted">
+          {orders.length} order{orders.length === 1 ? "" : "s"}
+        </p>
+        <Button
+          type="button"
+          size="sm"
+          className="h-10"
+          onClick={() => {
+            downloadOrdersCsv(orders);
+            toast.success(`Exported ${orders.length} order${orders.length === 1 ? "" : "s"}.`);
+          }}
+        >
+          <Download className="h-4 w-4" aria-hidden />
+          Export CSV
+        </Button>
+      </div>
+
+      <div className="overflow-x-auto border border-border bg-card">
+        <table className="w-full min-w-[60rem] border-collapse text-left">
+          <thead>
+            <tr className="border-b border-border">
+              {["Order", "Date", "Time", "Name", "Phone", "Governorate", "Address", "Payment"].map(
+                (heading) => (
+                  <th
+                    key={heading}
+                    scope="col"
+                    className="whitespace-nowrap px-4 py-3 font-sans text-[11px] uppercase tracking-[0.14em] text-muted"
+                  >
+                    {heading}
+                  </th>
+                ),
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order.orderNumber} className="border-b border-border last:border-b-0">
+                <td className="whitespace-nowrap px-4 py-3 font-sans text-sm text-foreground">
+                  {order.orderNumber}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 font-sans text-sm text-muted">
+                  {orderDate(order)}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 font-sans text-sm text-muted">
+                  {orderTime(order)}
+                </td>
+                <td className="px-4 py-3 font-sans text-sm text-foreground">
+                  {order.customerName}
+                </td>
+                {/* dir="ltr" so an Egyptian number never renders reversed
+                    beside Arabic text in the next column. */}
+                <td
+                  dir="ltr"
+                  className="whitespace-nowrap px-4 py-3 font-mono text-sm text-foreground"
+                >
+                  {order.customerMobile}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 font-sans text-sm text-foreground">
+                  {order.address["governorate"] ?? "—"}
+                </td>
+                <td className="px-4 py-3 font-sans text-sm leading-relaxed text-muted">
+                  {[
+                    order.address["street"],
+                    order.address["building"] && `Bldg ${order.address["building"]}`,
+                    order.address["floor"] && `Fl ${order.address["floor"]}`,
+                    order.address["apartment"] && `Apt ${order.address["apartment"]}`,
+                    order.address["city"],
+                  ]
+                    .filter(Boolean)
+                    .join(", ")}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3">
+                  <PaymentCell order={order} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The payment column.
+ *
+ * An unpaid transfer is the only state here that can cost money, so it is the
+ * only one coloured — everything else is deliberately quiet, because a table
+ * where every row shouts is a table nobody reads.
+ */
+function PaymentCell({ order }: { order: AdminOrder }) {
+  const unpaidTransfer = order.paymentMethod === "instapay" && order.paymentStatus !== "paid";
+
+  return (
+    <span className="flex flex-col gap-1">
+      <span className="font-sans text-sm text-foreground">{paymentMethodLabel(order)}</span>
+      <span className={cn("font-sans text-xs", unpaidTransfer ? "text-error" : "text-muted")}>
+        {paymentStatusLabel(order)}
+      </span>
     </span>
   );
 }

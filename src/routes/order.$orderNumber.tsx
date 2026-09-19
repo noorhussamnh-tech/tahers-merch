@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { formatEGP } from "@/lib/domain/money";
 import { getOrderStatus, type OrderStatus } from "@/lib/api/order";
+import { loadInstapayAccount, type InstapayAccount } from "@/lib/api/catalog";
 import { recallOrder } from "@/lib/cart/confirmation";
 import { SiteFooter } from "@/components/home-sections";
 import { UI } from "@/lib/catalog/copy";
@@ -31,12 +32,17 @@ export const Route = createFileRoute("/order/$orderNumber")({
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  loader: ({ params }) => getOrderStatus({ data: { orderNumber: params.orderNumber } }),
+  loader: async ({ params }) => ({
+    status: await getOrderStatus({ data: { orderNumber: params.orderNumber } }),
+    // Needed only for a transfer order, but fetched here so the account
+    // details are on screen the instant the page is, not a render later.
+    instapay: await loadInstapayAccount(),
+  }),
   component: OrderPage,
 });
 
 function OrderPage() {
-  const status = Route.useLoaderData();
+  const { status, instapay } = Route.useLoaderData();
   const { orderNumber } = Route.useParams();
 
   // Read after mount: sessionStorage does not exist during server rendering.
@@ -112,7 +118,13 @@ function OrderPage() {
           )}
         </div>
 
-        <PaymentGuidance method={status.paymentMethod} status={status.paymentStatus} />
+        <PaymentGuidance
+          method={status.paymentMethod}
+          status={status.paymentStatus}
+          instapay={instapay}
+          total={status.total}
+          orderNumber={status.orderNumber}
+        />
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <Button asChild size="lg">
@@ -182,6 +194,9 @@ function paymentLabel(method: OrderStatus["paymentMethod"], status: PaymentStatu
   if (method === "cod") {
     return status === "pending" ? "Cash on delivery" : `Payment ${status}`;
   }
+  if (method === "instapay") {
+    return status === "paid" ? "Transfer confirmed" : "Awaiting your transfer";
+  }
   switch (status) {
     case "paid":
       return "Payment confirmed";
@@ -199,10 +214,27 @@ function paymentLabel(method: OrderStatus["paymentMethod"], status: PaymentStatu
 function PaymentGuidance({
   method,
   status,
+  instapay,
+  total,
+  orderNumber,
 }: {
   method: OrderStatus["paymentMethod"];
   status: PaymentStatus;
+  instapay: InstapayAccount | null;
+  total: number;
+  orderNumber: string;
 }) {
+  if (method === "instapay") {
+    return (
+      <InstapayInstructions
+        account={instapay}
+        status={status}
+        total={total}
+        orderNumber={orderNumber}
+      />
+    );
+  }
+
   if (method === "cod") {
     return (
       <p dir="rtl" className="mt-8 font-arabic text-base leading-loose text-muted">
@@ -261,6 +293,105 @@ function UnknownOrder() {
       <Button asChild>
         <Link to="/track">{UI.trackOrder}</Link>
       </Button>
+    </div>
+  );
+}
+
+/**
+ * What an Instapay customer has to do next.
+ *
+ * This is the only screen that tells them where to send the money, so it is
+ * written to survive being read once, on a phone, in a hurry:
+ *
+ *   · The account and the exact amount are the two things that must be
+ *     copyable and unmistakable, so they are large, monospaced and on their
+ *     own lines rather than buried in a sentence.
+ *   · The order number goes in the transfer note. It is what lets whoever
+ *     checks the bank app match a transfer to an order without guessing from
+ *     the amount -- and with a single price, the amount identifies nobody.
+ *   · It says plainly that the cap is not shipped until the transfer is
+ *     confirmed, because the alternative is a customer who believes ordering
+ *     was enough and is angry three days later.
+ *
+ * If the account is somehow missing, it says so and points at support rather
+ * than rendering an empty box that looks like a loading state.
+ */
+function InstapayInstructions({
+  account,
+  status,
+  total,
+  orderNumber,
+}: {
+  account: InstapayAccount | null;
+  status: PaymentStatus;
+  total: number;
+  orderNumber: string;
+}) {
+  if (status === "paid") {
+    return (
+      <div className="mt-8 border border-success/40 bg-card p-5">
+        <p dir="rtl" className="font-arabic text-base leading-loose text-success">
+          تم تأكيد التحويل. طلبك في طريقه.
+        </p>
+        <p className="mt-2 font-sans text-xs leading-relaxed text-muted">
+          We have received your transfer. Nothing further is needed from you.
+        </p>
+      </div>
+    );
+  }
+
+  if (!account) {
+    return (
+      <div className="mt-8 border border-error/40 bg-card p-5">
+        <p className="font-sans text-sm leading-relaxed text-foreground">
+          Your order is saved, but the transfer details are not available on this page right now.
+          Please get in touch with your order number, {orderNumber}, and we will send them to you.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-8 border border-signal/40 bg-card p-6">
+      <p className="control text-signal">Send the transfer to complete your order</p>
+
+      <dl className="mt-5 flex flex-col gap-4">
+        <div>
+          <dt className="eyebrow">Instapay account</dt>
+          <dd dir="ltr" className="mt-1 select-all font-mono text-lg leading-snug text-foreground">
+            {account.handle}
+          </dd>
+          {account.name && (
+            <dd className="mt-1 font-sans text-xs text-muted">Account name: {account.name}</dd>
+          )}
+        </div>
+
+        <div>
+          <dt className="eyebrow">Amount</dt>
+          <dd dir="ltr" className="mt-1 select-all font-mono text-lg text-foreground">
+            {formatEGP(total)}
+          </dd>
+        </div>
+
+        <div>
+          <dt className="eyebrow">Put this in the transfer note</dt>
+          <dd dir="ltr" className="mt-1 select-all font-mono text-lg text-foreground">
+            {orderNumber}
+          </dd>
+          <dd className="mt-1 font-sans text-xs text-muted">
+            It is how we match your transfer to your order.
+          </dd>
+        </div>
+      </dl>
+
+      <p className="mt-5 border-t border-border pt-4 font-sans text-xs leading-relaxed text-muted">
+        Your cap is held for you. It ships once we have confirmed the transfer — usually the same
+        day. You can check the status any time on the tracking page.
+      </p>
+
+      <p dir="rtl" className="mt-3 font-arabic text-sm leading-loose text-muted">
+        الكاب محجوز باسمك. يُشحن بعد تأكيد التحويل.
+      </p>
     </div>
   );
 }

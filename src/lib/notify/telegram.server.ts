@@ -32,10 +32,14 @@ function buildMessage(order: OrderNotification): string {
     .map((line) => `• ${escapeHtml(line.name)} ×${line.quantity}`)
     .join("\n");
 
+  const amount = `<b>${(order.total / 100).toLocaleString("en-EG")} EGP</b>`;
+
   const payment =
     order.paymentMethod === "cod"
-      ? `💵 Cash on delivery — collect <b>${(order.total / 100).toLocaleString("en-EG")} EGP</b>`
-      : `💳 Paid online — <b>${(order.total / 100).toLocaleString("en-EG")} EGP</b>`;
+      ? `💵 Cash on delivery — collect ${amount}`
+      : order.paymentMethod === "instapay"
+        ? `🏦 Instapay — ${amount} <b>NOT PAID YET</b>. Confirm the transfer before shipping.`
+        : `💳 Paid online — ${amount}`;
 
   return [
     `🧢 <b>New order ${escapeHtml(order.orderNumber)}</b>`,

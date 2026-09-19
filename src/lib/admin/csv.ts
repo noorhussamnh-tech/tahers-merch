@@ -18,9 +18,17 @@
 import { piastresToPounds } from "@/lib/domain/money";
 import type { AdminOrder } from "./api";
 
-/** Columns, in the order couriers generally expect them. */
+/**
+ * Columns, in the order couriers generally expect them.
+ *
+ * Date and time are separate columns rather than one timestamp: a courier
+ * sorts and filters by day, and a spreadsheet treats "18/09/2026, 21:04" as
+ * text while it treats a bare date as a date.
+ */
 const HEADERS = [
   "Order number",
+  "Order date",
+  "Order time",
   "Customer name",
   "Phone",
   "Street",
@@ -31,9 +39,10 @@ const HEADERS = [
   "Governorate",
   "Items",
   "Cash to collect (EGP)",
-  "Payment",
+  "Payment method",
+  "Payment status",
+  "Payment reference",
   "Order status",
-  "Placed at",
   "Delivery notes",
 ] as const;
 
@@ -59,12 +68,60 @@ export function toCsvRow(fields: readonly unknown[]): string {
 /**
  * What the courier collects at the door.
  *
- * Zero for an order already paid online: asking a courier to collect cash on
- * a paid order is how a customer gets charged twice.
+ * Only a cash order is ever collected against. Everything else is zero, and
+ * the two reasons are different:
+ *
+ *   · A PAID order -- online or transfer -- must not be collected on, because
+ *     that charges the customer twice.
+ *   · An UNPAID TRANSFER must not be collected on either, and this is the
+ *     subtle one. The money is supposed to arrive by bank transfer, not at
+ *     the door. Putting the total in this column would quietly convert it to
+ *     cash on delivery without anyone deciding to, and the customer could end
+ *     up paying both ways. An unpaid transfer should not reach a courier at
+ *     all -- see `paymentStatusLabel`, which shouts about it.
  */
 export function cashToCollect(order: AdminOrder): number {
+  if (order.paymentMethod !== "cod") return 0;
   if (order.paymentStatus === "paid") return 0;
   return piastresToPounds(order.total);
+}
+
+/** How the customer is paying, in words a courier will understand. */
+export function paymentMethodLabel(order: AdminOrder): string {
+  switch (order.paymentMethod) {
+    case "cod":
+      return "Cash on delivery";
+    case "instapay":
+      return "Instapay transfer";
+    case "paymob":
+      return "Card online";
+  }
+}
+
+/**
+ * Whether the money is actually in.
+ *
+ * An unpaid transfer is written in capitals and says what to do, because this
+ * file's whole job is to be read in a hurry by somebody about to hand over
+ * parcels.
+ */
+export function paymentStatusLabel(order: AdminOrder): string {
+  if (order.paymentMethod === "instapay" && order.paymentStatus !== "paid") {
+    return "NOT PAID - DO NOT SHIP";
+  }
+  return order.paymentStatus === "paid" ? "Paid" : order.paymentStatus;
+}
+
+/** Splits the timestamp the way a spreadsheet wants it. */
+export function orderDate(order: AdminOrder): string {
+  return new Date(order.placedAt).toLocaleDateString("en-GB");
+}
+
+export function orderTime(order: AdminOrder): string {
+  return new Date(order.placedAt).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function describeItems(order: AdminOrder): string {
@@ -78,6 +135,8 @@ export function ordersToCsv(orders: readonly AdminOrder[]): string {
     rows.push(
       toCsvRow([
         order.orderNumber,
+        orderDate(order),
+        orderTime(order),
         order.customerName,
         // Leading apostrophe keeps Excel from eating the leading zero and
         // turning 01012345678 into 1012345678.
@@ -90,9 +149,10 @@ export function ordersToCsv(orders: readonly AdminOrder[]): string {
         order.address["governorate"] ?? "",
         describeItems(order),
         cashToCollect(order),
-        order.paymentMethod === "cod" ? "Cash on delivery" : `Online (${order.paymentStatus})`,
+        paymentMethodLabel(order),
+        paymentStatusLabel(order),
+        order.paymentReference ?? "",
         order.fulfilmentStatus,
-        new Date(order.placedAt).toLocaleString("en-GB"),
         order.address["notes"] ?? "",
       ]),
     );

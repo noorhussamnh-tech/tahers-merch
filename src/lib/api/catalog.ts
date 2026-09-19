@@ -115,3 +115,53 @@ export const loadShippingZones = createServerFn({ method: "GET" }).handler(
     return ((data ?? []) as ZoneRow[]).map(toZone);
   },
 );
+
+/**
+ * The account an Instapay customer transfers to.
+ *
+ * Null means Instapay is switched off, and that is the only switch there is:
+ * the checkout hides the option, so nobody is ever offered a payment method
+ * with nowhere to send the money. Filling the setting in turns it on, with no
+ * deployment — which matters, because a wrong account number is the one thing
+ * here that loses real money and it has to be fixable in seconds.
+ *
+ * Read through the publishable key like everything else in this file. The row
+ * is marked public in tc_store_settings because a payment handle is meant to
+ * be given out; that is a deliberate flag on one row, not a default.
+ */
+export interface InstapayAccount {
+  /** The Instapay address or mobile number to transfer to. */
+  readonly handle: string;
+  /** The account holder's name, so a customer can check before sending. */
+  readonly name: string;
+}
+
+export const loadInstapayAccount = createServerFn({ method: "GET" }).handler(
+  async (): Promise<InstapayAccount | null> => {
+    let supabase;
+    try {
+      supabase = getPublicServerClient();
+    } catch {
+      return null;
+    }
+
+    const { data, error } = await supabase
+      .from("tc_store_settings")
+      .select("value")
+      .eq("key", "instapay_account")
+      .maybeSingle();
+
+    // A missing row is "not set up", not a failure. The shop keeps selling
+    // for cash.
+    if (error || !data) return null;
+
+    const value = (data as { value: unknown }).value as Partial<InstapayAccount> | null;
+    const handle = value?.handle?.trim() ?? "";
+    const name = value?.name?.trim() ?? "";
+
+    // No handle, no option. A name on its own is not somewhere to send money.
+    if (!handle) return null;
+
+    return { handle, name };
+  },
+);

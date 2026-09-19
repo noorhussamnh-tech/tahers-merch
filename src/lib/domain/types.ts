@@ -9,7 +9,15 @@ import type { Piastres } from "./money";
 import type { ProductSlug } from "@/lib/catalog/products";
 
 /** How the customer chose to pay. */
-export type PaymentMethod = "paymob" | "cod";
+/**
+ * How an order is paid for.
+ *
+ * "instapay" is a bank transfer the customer makes themselves and somebody
+ * verifies by hand -- there is no callback, so it behaves like cash on
+ * delivery for stock and like an online order for money: placed unpaid, and
+ * never shipped until an administrator confirms the transfer arrived.
+ */
+export type PaymentMethod = "paymob" | "cod" | "instapay";
 
 /**
  * Payment state.

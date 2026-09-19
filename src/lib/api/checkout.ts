@@ -189,7 +189,10 @@ export const placeOrder = createServerFn({ method: "POST" })
       lines: order.lines.map((line) => ({ name: line.name, quantity: line.quantity })),
     });
 
-    if (data.paymentMethod === "cod") return placed;
+    // Cash and transfers both finish here: neither has an online payment
+    // step to send the customer to. A transfer order leaves as `pending` and
+    // stays that way until somebody confirms the money arrived.
+    if (data.paymentMethod === "cod" || data.paymentMethod === "instapay") return placed;
 
     // Online payment: start the intention and hand back somewhere to go.
     //

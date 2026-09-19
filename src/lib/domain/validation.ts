@@ -74,7 +74,7 @@ export const checkoutSchema = z.object({
   items: z.array(cartLineSchema).min(1, "Your cart is empty.").max(PRODUCT_SLUGS.length),
   customer: customerSchema,
   address: deliveryAddressSchema,
-  paymentMethod: z.enum(["paymob", "cod"]),
+  paymentMethod: z.enum(["paymob", "cod", "instapay"]),
   discountCode: trimmed(40).optional(),
   acceptedTerms: z.literal(true, {
     errorMap: () => ({ message: "You must accept the terms to place an order." }),

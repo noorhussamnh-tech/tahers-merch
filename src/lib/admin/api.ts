@@ -39,6 +39,12 @@ export interface AdminOrder {
   readonly total: number;
   readonly paymobOrderId: string | null;
   readonly paymobTransactionId: string | null;
+  /**
+   * What the administrator who confirmed an Instapay transfer matched it
+   * against. Null on every other kind of order, and on a transfer nobody has
+   * confirmed yet -- which is exactly the state that must not be shipped.
+   */
+  readonly paymentReference: string | null;
   readonly placedAt: string;
   readonly lines: readonly {
     name: string;
@@ -122,6 +128,24 @@ export function updateFulfilment(
     p_order_number: orderNumber,
     p_status: status,
     p_note: note?.trim() || null,
+  });
+}
+
+/**
+ * Records that an Instapay transfer arrived.
+ *
+ * The reference is optional but worth insisting on in practice: it is the
+ * only trace of why somebody believed the money was there, and the question
+ * "are we sure this one paid?" gets asked after the cap has shipped, not
+ * before.
+ *
+ * Idempotent in the database, so two people confirming the same order on
+ * launch day is harmless rather than a double-payment bug.
+ */
+export function confirmTransfer(orderNumber: string, reference?: string): Promise<unknown> {
+  return rpc("tc_admin_confirm_transfer", {
+    p_order_number: orderNumber,
+    p_reference: reference?.trim() || null,
   });
 }
 

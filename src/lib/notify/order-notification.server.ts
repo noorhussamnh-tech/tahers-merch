@@ -28,7 +28,7 @@ export interface OrderNotification {
   readonly apartment: string;
   readonly notes?: string | undefined;
   readonly total: number;
-  readonly paymentMethod: "cod" | "paymob";
+  readonly paymentMethod: "cod" | "paymob" | "instapay";
   readonly lines: readonly { name: string; quantity: number }[];
 }
 
@@ -58,10 +58,18 @@ export function buildOrderEmail(order: OrderNotification): { subject: string; ht
     .map((line) => `${escapeHtml(line.name)} &times;${line.quantity}`)
     .join("<br />");
 
+  /*
+   * The payment line is the one an unpaid transfer has to survive. An Instapay
+   * order arrives looking exactly like a paid one -- same total, same address,
+   * placed the same way -- and the money has not moved yet. If this line does
+   * not say so, somebody packs it and ships it.
+   */
   const payment =
     order.paymentMethod === "cod"
       ? `Cash on delivery — <strong>collect ${egp(order.total)}</strong>`
-      : `Paid online — ${egp(order.total)}`;
+      : order.paymentMethod === "instapay"
+        ? `Instapay — <strong style="color:#7d252a;">NOT PAID YET (${egp(order.total)})</strong>. Check the transfer arrived, mark it paid in /admin, and do not ship until you have.`
+        : `Paid online — ${egp(order.total)}`;
 
   const address = [
     `${escapeHtml(order.street)}, Building ${escapeHtml(order.building)}`,
@@ -78,7 +86,10 @@ export function buildOrderEmail(order: OrderNotification): { subject: string; ht
   return {
     // The subject is the notification. Everything needed to decide whether to
     // act on it right now is here.
-    subject: `New order ${order.orderNumber} — ${egp(order.total)} — ${order.city}`,
+    subject:
+      order.paymentMethod === "instapay"
+        ? `New order ${order.orderNumber} — ${egp(order.total)} — AWAITING TRANSFER — ${order.city}`
+        : `New order ${order.orderNumber} — ${egp(order.total)} — ${order.city}`,
     html: `<!doctype html>
 <html><body style="margin:0;padding:24px;background:#f5f0e6;font-family:-apple-system,'Segoe UI',sans-serif;">
   <div style="max-width:560px;margin:0 auto;background:#fffdf8;border:1px solid #cfc6b9;">

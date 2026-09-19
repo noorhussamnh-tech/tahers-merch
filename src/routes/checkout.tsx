@@ -20,6 +20,8 @@ import { GOVERNORATES } from "@/lib/domain/egypt";
 import { Route as RootRoute } from "./__root";
 import { checkoutSchema, fieldErrors } from "@/lib/domain/validation";
 import { formatEGP } from "@/lib/domain/money";
+import type { PaymentMethod } from "@/lib/domain/types";
+import { loadInstapayAccount } from "@/lib/api/catalog";
 import { placeOrder, quoteOrder } from "@/lib/api/checkout";
 import { productContent } from "@/lib/catalog/products";
 import { rememberOrder } from "@/lib/cart/confirmation";
@@ -27,6 +29,10 @@ import { useCart } from "@/lib/cart/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/checkout")({
+  // Loaded here rather than in the component so the payment options are right
+  // in the first render. Offering "Instapay" for a moment and then removing it
+  // would be worse than never showing it.
+  loader: async () => ({ instapay: await loadInstapayAccount() }),
   head: () => ({
     meta: [
       { title: "Checkout | Taher's Merch" },
@@ -59,7 +65,8 @@ function CheckoutPage() {
   const { products } = RootRoute.useLoaderData();
 
   const [form, setForm] = useState(EMPTY_FORM);
-  const [paymentMethod, setPaymentMethod] = useState<"paymob" | "cod">("cod");
+  const { instapay } = Route.useLoaderData();
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [discountCode, setDiscountCode] = useState("");
   const [appliedCode, setAppliedCode] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -108,9 +115,11 @@ function CheckoutPage() {
   // online payment rather than letting them submit something that will fail.
   useEffect(() => {
     if (quote && !quote.codAvailable && paymentMethod === "cod") {
-      setPaymentMethod("paymob");
+      // Cash refused here. A transfer is the closer substitute -- it works in
+      // every governorate and needs no card -- so prefer it when it is on.
+      setPaymentMethod(instapay ? "instapay" : "paymob");
     }
-  }, [quote, paymentMethod]);
+  }, [quote, paymentMethod, instapay]);
 
   if (cart.ready && cart.lines.length === 0) {
     return <EmptyCheckout />;
@@ -346,6 +355,20 @@ function CheckoutPage() {
                   : "Pay the courier when the cap arrives."
               }
             />
+            {/*
+              Shown only when an account has actually been set. The alternative
+              -- offering it and explaining the account later -- means a
+              customer choosing a way to pay that does not exist yet.
+            */}
+            {instapay && (
+              <PaymentOption
+                value="instapay"
+                current={paymentMethod}
+                onSelect={setPaymentMethod}
+                title="Instapay transfer"
+                note="Transfer the total, then send us the receipt. We confirm it before the cap ships. The account details appear on the next screen."
+              />
+            )}
             <PaymentOption
               value="paymob"
               current={paymentMethod}
@@ -542,9 +565,9 @@ function PaymentOption({
   note,
   disabled,
 }: {
-  value: "paymob" | "cod";
+  value: PaymentMethod;
   current: string;
-  onSelect: (value: "paymob" | "cod") => void;
+  onSelect: (value: PaymentMethod) => void;
   title: string;
   note: string;
   disabled?: boolean;

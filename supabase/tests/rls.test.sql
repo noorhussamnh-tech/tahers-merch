@@ -50,7 +50,15 @@ begin
   perform assert((select count(*) from tc_products) = 1, 'anon sees only the active product');
   perform assert((select count(*) from tc_products where slug = 'al-adou') = 0,
                  'an inactive product is invisible, not merely unbuyable');
-  perform assert((select count(*) from tc_shipping_zones) = 27, 'anon can read shipping fees');
+  -- What is being tested is that the row-level security policy lets an
+  -- anonymous visitor read the zones at all -- the checkout cannot quote
+  -- delivery otherwise. NOT how many there are: the delivery area is a
+  -- business decision and has already gone from twenty-seven to two. Pinning
+  -- the count here turns every such decision into a failing test that says
+  -- nothing about security.
+  perform assert((select count(*) from tc_shipping_zones) > 0, 'anon can read shipping fees');
+  perform assert((select fee_piastres from tc_shipping_zones where governorate = 'Cairo') is not null,
+                 'anon can read a specific zone fee');
   -- One photograph per cap has been supplied, and only the active cap's is
   -- visible. The number is the count of supplied views, not a fixed five:
   -- add a view and this assertion is where you are reminded to update it.
@@ -58,7 +66,19 @@ begin
                  'anon sees photographs for the active product only');
 
   -- Settings: only the rows marked public.
-  perform assert((select count(*) from tc_store_settings) = 2, 'anon sees only public settings');
+  --
+  -- The exact key names rather than a count, because the count told us nothing
+  -- about WHICH rows leaked -- adding a public setting broke this test, and
+  -- adding a private one that leaked would not have. Naming them means any new
+  -- key has to be added here deliberately, by somebody who has thought about
+  -- whether an anonymous visitor should see it.
+  --
+  -- instapay_account is public on purpose: it holds the handle customers
+  -- transfer to, which the checkout has to display.
+  perform assert(
+    (select array_agg(key order by key) from tc_store_settings)
+      = array['instapay_account', 'returns_policy_ar', 'support_contact'],
+    'anon sees exactly the settings marked public, and no others');
   perform assert((select count(*) from tc_store_settings where key = 'discount_codes') = 0,
                  'discount codes are not readable');
   perform assert((select count(*) from tc_store_settings where key = 'reservation_minutes') = 0,

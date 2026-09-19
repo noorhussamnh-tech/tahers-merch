@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { cashToCollect, csvFilename, escapeCsvField, ordersToCsv, toCsvRow } from "./csv";
+import {
+  cashToCollect,
+  csvFilename,
+  escapeCsvField,
+  orderDate,
+  orderTime,
+  ordersToCsv,
+  paymentMethodLabel,
+  paymentStatusLabel,
+  toCsvRow,
+} from "./csv";
 import type { AdminOrder } from "./api";
 
 function order(overrides: Partial<AdminOrder> = {}): AdminOrder {
@@ -26,6 +36,7 @@ function order(overrides: Partial<AdminOrder> = {}): AdminOrder {
     total: 105_000,
     paymobOrderId: null,
     paymobTransactionId: null,
+    paymentReference: null,
     placedAt: "2026-09-18T10:00:00.000Z",
     lines: [{ name: "تايوان يا ريس", quantity: 1, unitPrice: 95_000, lineTotal: 95_000 }],
     ...overrides,
@@ -74,16 +85,76 @@ describe("cashToCollect", () => {
     expect(cashToCollect(order({ paymentMethod: "paymob", paymentStatus: "paid" }))).toBe(0);
   });
 
-  it("is the full total for an online order that never completed", () => {
-    expect(cashToCollect(order({ paymentMethod: "paymob", paymentStatus: "failed" }))).toBe(1050);
+  it("is zero for an online order that never completed, because it is not a cash order", () => {
+    // The customer chose a card. If the card failed, the fix is a new order or
+    // a call -- not silently converting it to cash at the door.
+    expect(cashToCollect(order({ paymentMethod: "paymob", paymentStatus: "failed" }))).toBe(0);
+  });
+
+  it("is zero for an UNPAID transfer, so the courier never collects it as cash", () => {
+    // The one that would cost real money: an Instapay order is meant to be
+    // paid by bank transfer. Putting its total in the cash column turns it
+    // into cash on delivery without anyone deciding to, and a customer who
+    // has already transferred would pay twice.
+    expect(cashToCollect(order({ paymentMethod: "instapay", paymentStatus: "pending" }))).toBe(0);
+  });
+
+  it("is zero for a confirmed transfer", () => {
+    expect(cashToCollect(order({ paymentMethod: "instapay", paymentStatus: "paid" }))).toBe(0);
+  });
+});
+
+describe("payment labels", () => {
+  it("names each method in words a courier understands", () => {
+    expect(paymentMethodLabel(order())).toBe("Cash on delivery");
+    expect(paymentMethodLabel(order({ paymentMethod: "instapay" }))).toBe("Instapay transfer");
+    expect(paymentMethodLabel(order({ paymentMethod: "paymob" }))).toBe("Card online");
+  });
+
+  it("shouts about an unpaid transfer rather than stating a status", () => {
+    expect(paymentStatusLabel(order({ paymentMethod: "instapay", paymentStatus: "pending" }))).toBe(
+      "NOT PAID - DO NOT SHIP",
+    );
+  });
+
+  it("is calm once the transfer is confirmed", () => {
+    expect(paymentStatusLabel(order({ paymentMethod: "instapay", paymentStatus: "paid" }))).toBe(
+      "Paid",
+    );
+  });
+});
+
+describe("order date and time", () => {
+  it("splits the timestamp into two columns a spreadsheet can sort", () => {
+    const o = order({ placedAt: "2026-09-18T10:05:00.000Z" });
+    expect(orderDate(o)).toBe("18/09/2026");
+    expect(orderTime(o)).toMatch(/^\d{2}:\d{2}$/);
   });
 });
 
 describe("ordersToCsv", () => {
-  it("starts with a header row", () => {
-    const [header] = ordersToCsv([]).split("\r\n");
-    expect(header).toContain("Order number");
-    expect(header).toContain("Cash to collect (EGP)");
+  it("starts with a header row carrying every column asked for", () => {
+    const [header = ""] = ordersToCsv([]).split("\r\n");
+    for (const column of [
+      "Order number",
+      "Order date",
+      "Order time",
+      "Customer name",
+      "Phone",
+      "Governorate",
+      "Cash to collect (EGP)",
+      "Payment method",
+      "Payment status",
+    ]) {
+      expect(header).toContain(column);
+    }
+  });
+
+  it("carries the transfer reference so a payment can be traced back", () => {
+    const csv = ordersToCsv([
+      order({ paymentMethod: "instapay", paymentStatus: "paid", paymentReference: "REF-99" }),
+    ]);
+    expect(csv).toContain("REF-99");
   });
 
   it("writes one row per order", () => {

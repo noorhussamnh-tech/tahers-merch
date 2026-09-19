@@ -42,8 +42,20 @@ update tc_products set price_piastres = 80000, stock_quantity = 3, active = true
 
 update tc_shipping_zones set fee_piastres = 6000, cod_available = true,  min_days = 2, max_days = 4
  where governorate = 'Cairo';
-update tc_shipping_zones set fee_piastres = 11000, cod_available = false, min_days = 5, max_days = 7
- where governorate = 'Aswan';
+
+-- Inserted, not updated. The tests below need one zone that refuses cash on
+-- delivery, and which governorates the shop actually serves is a business
+-- decision that changes -- it has already gone from twenty-seven to two. A
+-- test that depends on the seed still listing Aswan silently stops testing
+-- anything the day that changes, because `update ... where` matching no rows
+-- is not an error.
+insert into tc_shipping_zones (governorate, fee_piastres, cod_available, min_days, max_days)
+values ('Aswan', 11000, false, 5, 7)
+on conflict (governorate) do update
+   set fee_piastres = excluded.fee_piastres,
+       cod_available = excluded.cod_available,
+       min_days = excluded.min_days,
+       max_days = excluded.max_days;
 
 \echo '== quoting ============================================================'
 
@@ -604,6 +616,107 @@ begin
   perform assert(jsonb_array_length(tc_admin_orders('TC-')) > 0, 'admin can search by order number');
   perform assert(jsonb_array_length(tc_admin_orders('01098765432')) = 1, 'admin can search by mobile');
   perform assert(jsonb_array_length(tc_admin_orders('nothing-matches-this')) = 0, 'a search can find nothing');
+end;
+$$;
+
+\echo '== instapay: a transfer commits stock and waits for a human ==========='
+
+do $$
+declare
+  admin_id   uuid;
+  before_qty integer;
+  order_no   text;
+  result     jsonb;
+begin
+  perform set_config('request.jwt.claim.sub', '', true);
+
+  update tc_products set stock_quantity = 5, reserved_quantity = 0, active = true
+   where slug = 'taiwan';
+  select stock_quantity into before_qty from tc_products where slug = 'taiwan';
+
+  -- Aswan refuses cash on delivery. A transfer must still be accepted there:
+  -- the courier's cash policy has nothing to do with a bank transfer.
+  order_no := tc_place_order(
+    '[{"slug":"taiwan","quantity":2}]'::jsonb,
+    '{"fullName":"Transfer Customer","mobile":"01099999999"}'::jsonb,
+    '{"governorate":"Aswan","city":"A","street":"B","building":"1","floor":"1","apartment":"1"}'::jsonb,
+    'instapay', gen_random_uuid()) ->> 'orderNumber';
+
+  perform assert(order_no is not null, 'instapay is accepted where cash on delivery is refused');
+
+  -- Committed, not reserved. This is the whole design decision: an expiring
+  -- hold would cancel orders that were genuinely paid.
+  perform assert((select stock_quantity from tc_products where slug = 'taiwan') = before_qty - 2,
+                 'a transfer order deducts stock immediately');
+  perform assert((select reserved_quantity from tc_products where slug = 'taiwan') = 0,
+                 'a transfer order reserves nothing');
+  perform assert((select stock_committed from tc_orders where order_number = order_no) = true,
+                 'a transfer order is marked as having taken its stock');
+  perform assert((select reservation_expires_at from tc_orders where order_number = order_no) is null,
+                 'a transfer order never expires');
+
+  -- Placing it does NOT pay for it. Shipping an unpaid transfer order is the
+  -- one way this payment method loses money.
+  perform assert((select payment_status from tc_orders where order_number = order_no) = 'pending',
+                 'a transfer order starts unpaid');
+
+  -- Only an administrator may say the money arrived.
+  perform assert(
+    expect_error(format($q$ select tc_admin_confirm_transfer(%L) $q$, order_no)) like '%not_authorized%',
+    'an anonymous caller cannot confirm a transfer');
+
+  select auth_user_id into admin_id from tc_admins limit 1;
+  perform set_config('request.jwt.claim.sub', admin_id::text, true);
+
+  result := tc_admin_confirm_transfer(order_no, '  REF-12345  ');
+  perform assert((select payment_status from tc_orders where order_number = order_no) = 'paid',
+                 'confirming a transfer marks it paid');
+  perform assert((select payment_reference from tc_orders where order_number = order_no) = 'REF-12345',
+                 'the reference is trimmed and recorded');
+  perform assert((result ->> 'alreadyPaid') = 'false', 'the first confirmation reports as new');
+
+  -- Two people checking the bank app on launch day must not corrupt anything.
+  result := tc_admin_confirm_transfer(order_no, null);
+  perform assert((result ->> 'alreadyPaid') = 'true', 'confirming twice is reported, not an error');
+  perform assert((select payment_reference from tc_orders where order_number = order_no) = 'REF-12345',
+                 'a second confirmation without a reference keeps the first one');
+
+  -- Not every order is a transfer.
+  perform assert(
+    expect_error($q$
+      select tc_admin_confirm_transfer(
+        (select order_number from tc_orders where payment_method = 'cod' limit 1))
+    $q$) like '%not_a_transfer_order%',
+    'a cash order cannot be confirmed as a transfer');
+end;
+$$;
+
+\echo '== instapay: a cancelled order cannot be revived by a payment =========='
+
+do $$
+declare
+  admin_id uuid;
+  order_no text;
+begin
+  perform set_config('request.jwt.claim.sub', '', true);
+  update tc_products set stock_quantity = 5, reserved_quantity = 0 where slug = 'taiwan';
+
+  order_no := tc_place_order(
+    '[{"slug":"taiwan","quantity":1}]'::jsonb,
+    '{"fullName":"Gone","mobile":"01088888888"}'::jsonb,
+    '{"governorate":"Cairo","city":"A","street":"B","building":"1","floor":"1","apartment":"1"}'::jsonb,
+    'instapay', gen_random_uuid()) ->> 'orderNumber';
+
+  select auth_user_id into admin_id from tc_admins limit 1;
+  perform set_config('request.jwt.claim.sub', admin_id::text, true);
+
+  perform tc_admin_update_fulfilment(order_no, 'cancelled', 'customer changed their mind');
+
+  -- The stock went back on the shelf and may already have been sold to
+  -- somebody else. Confirming a payment must not quietly resurrect the order.
+  perform assert(
+    expect_error(format($q$ select tc_admin_confirm_transfer(%L) $q$, order_no)) like '%order_cancelled%',
+    'a cancelled transfer order cannot be marked paid');
 end;
 $$;
 
