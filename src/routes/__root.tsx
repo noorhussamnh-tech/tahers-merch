@@ -25,21 +25,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#F5F0E6" },
-      // The default title and description are Arabic: the shop's audience
-      // reads Arabic, and this is what a share card shows.
+      // The title is Arabic because the shop's audience reads Arabic and this
+      // is what a share card shows.
+      //
+      // The description under it is the brand name, at the client's
+      // instruction. It replaced a sentence naming «أشهر عبارات طاهر», which
+      // Taher moved away from. It does mean the brand appears twice on a share
+      // card, once in the title and again below it -- a known trade, made
+      // deliberately, not an oversight to tidy up.
       { title: "الإصدار الأول | Taher's Merch" },
-      {
-        name: "description",
-        content: "تصميمان من أشهر عبارات طاهر، متاحان بكمية محدودة.",
-      },
+      { name: "description", content: "Taher's Merch" },
       { property: "og:site_name", content: "Taher's Merch" },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "ar_EG" },
       { property: "og:title", content: "الإصدار الأول | Taher's Merch" },
-      {
-        property: "og:description",
-        content: "تصميمان من أشهر عبارات طاهر، متاحان بكمية محدودة.",
-      },
+      { property: "og:description", content: "Taher's Merch" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
