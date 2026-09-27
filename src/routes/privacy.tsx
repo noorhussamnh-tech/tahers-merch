@@ -140,8 +140,8 @@ function PrivacyPage() {
 
         <Section title="TERMS OF SALE">
           <p>
-            <strong className="text-foreground">Delivery.</strong> We currently ship to Cairo and
-            Giza only. The expected delivery time is shown at checkout before you place your order.
+            <strong className="text-foreground">Delivery.</strong> We ship to every governorate in
+            Egypt. The expected delivery time is shown at checkout before you place your order.
           </p>
           <p>
             <strong className="text-foreground">Payment.</strong> Cash on delivery, and online card

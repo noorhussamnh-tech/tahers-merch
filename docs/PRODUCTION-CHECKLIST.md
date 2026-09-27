@@ -28,15 +28,19 @@ Supplied and seeded — verify these landed rather than setting them:
 
 - [x] Price: 950.00 EGP on both caps
 - [x] Stock: 10 each, 20 total
-- [x] Shipping: 100.00 EGP flat, Cairo and Giza only
+- [x] Shipping: 100.00 EGP flat, all 27 governorates
 
 Still to decide:
 
-- [ ] Anywhere beyond Cairo and Giza: add a `tc_shipping_zones` row *and*
-      change the delivery answer in `src/lib/catalog/copy.ts`. Until both
-      happen, checkout refuses the destination, which is the intended behaviour
-- [ ] Cash-on-delivery availability — on for both seeded governorates, which is
-      the seeded default rather than a decision
+- [ ] **Does 100 EGP flat actually hold to Aswan?** The courier's rate card
+      almost certainly varies by distance. Every governorate is currently
+      quoted the same, which means the far ones may be sold at a loss. Set the
+      real per-governorate fees in `/admin` → Shipping
+- [ ] Cash-on-delivery availability — on everywhere, which is the seeded
+      default rather than a decision. COD to distant governorates carries real
+      refusal-rate and return-freight cost
+- [ ] To refuse a destination: delete its `tc_shipping_zones` row *and* narrow
+      the delivery answer in `src/lib/catalog/copy.ts` in the same change
 - [ ] Whether a flat 100 EGP holds for every destination, or needs to vary once
       the courier's rate card is known
 

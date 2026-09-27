@@ -163,9 +163,10 @@ Be honest with yourself about these. They are the gap between "it works" and
   Deployments → the top one → ⋯ → **Redeploy**, then check again.
 - **No card payments.** Cash on delivery only. Paymob is built and waiting for
   an account.
-- **Delivery is Cairo and Giza.** The site says so. Make sure the database
-  agrees — if it still lists other governorates, someone in Aswan can order
-  and you are committed.
+- **Delivery covers all of Egypt**, at a flat 100 EGP. That flat rate is a
+  guess, not the courier's rate card — reaching Aswan almost certainly costs
+  more than crossing Cairo, so the far governorates may be sold at a loss until
+  the real fees are set in `/admin` → Shipping.
 
 ---
 
@@ -178,8 +179,9 @@ Look at these weekly. They are early warnings, not a report.
   is slower than your promises.
 - **Cancellations** — a few are normal. A pattern means something upstream is
   wrong: the price, the delivery time, or the courier.
-- **Orders from outside Cairo and Giza** — should be zero. If it is not, the
-  delivery area is open wider than the site says.
+- **Orders from far governorates** — watch what they actually cost to
+  deliver against the 100 EGP charged. This is the number most likely to be
+  quietly losing money.
 
 ---
 

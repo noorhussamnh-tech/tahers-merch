@@ -62,10 +62,12 @@ export const SHOP = {
  * are things a customer will hold the shop to. Change either only alongside
  * the thing it promises:
  *
- *   · `delivery` says Cairo and Giza only. The shipping zones are what
+ *   · `delivery` says everywhere in Egypt. The shipping zones are what
  *     actually enforce that -- a governorate with a row in tc_shipping_zones
- *     can be ordered to, whatever this answer says. If the two disagree, the
- *     zones win and this becomes a lie.
+ *     can be ordered to, and one without cannot, whatever this answer says.
+ *     If the two disagree, the zones win and this becomes a lie. It said
+ *     "Cairo and Giza only" until a courier covered the rest of the country;
+ *     narrow it again and the zones must be narrowed in the same change.
  *   · `returns` says at-the-door only, delivery paid either way. That is the
  *     policy, and it is the one customers argue about.
  *
@@ -78,7 +80,7 @@ export const FAQ = [
     id: "delivery",
     question: "HOW LONG DOES DELIVERY TAKE?",
     answer:
-      "We currently ship to Cairo and Giza only. The expected delivery time is shown at checkout before you place your order.",
+      "We ship to every governorate in Egypt. The expected delivery time is shown at checkout before you place your order.",
   },
   {
     id: "returns",
