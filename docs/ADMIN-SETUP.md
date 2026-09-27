@@ -23,6 +23,35 @@ it besides.
 
 3. **Sign in** at `/admin`.
 
+## Adding a second administrator
+
+Same two steps, and the same warning applies: **there is one level of access,
+not several.** Anybody on `tc_admins` can see every order and every customer's
+address and phone number, and can also change prices, set stock, open and close
+the shop, and edit shipping fees. There is no orders-only role. Give it to
+somebody you would trust with the price of the product, because they can change
+it.
+
+1. Supabase dashboard → Authentication → Users → *Add user*. Their email, a
+   password you send them, and tick *Auto Confirm User*.
+2. SQL editor:
+
+   ```sql
+   insert into tc_admins (auth_user_id, email)
+   select id, email from auth.users where email = 'them@example.com';
+   ```
+
+3. Send them the password and the `/admin` link, and tell them to change the
+   password at first sign-in if they can.
+
+Check who currently has access at any time:
+
+```sql
+select email, created_at from tc_admins order by created_at;
+```
+
+---
+
 To remove somebody, delete their `tc_admins` row. Their Supabase account
 survives; their access does not.
 

@@ -1,0 +1,64 @@
+# Keeps the shop's database awake, and shouts if the shop is broken.
+#
+# WHY THIS EXISTS
+#
+# Supabase pauses a Free Plan project after roughly seven days of low database
+# activity. Their guidance is that "a few user requests to the database each
+# day" is enough to avoid it. A quiet week before launch would therefore take
+# the shop down on its own, with only a warning email to the project owner to
+# say so.
+#
+# WHAT IT PINGS, AND WHY IT MATTERS
+#
+# The HOMEPAGE, not /api/version. The version endpoint only reads environment
+# variables -- it answers instantly while the database is asleep, so pinging it
+# would keep nothing awake and report success the whole way down. The homepage
+# reads the products out of Postgres to render, which is the activity Supabase
+# is counting.
+#
+# It then checks a product name is really in the response. A 200 alone is not
+# proof: the page can render its static copy while the catalogue query fails.
+# If the Arabic name is present, the database answered.
+#
+# THIS IS A BACKSTOP, NOT THE PLAN. A scheduled workflow is disabled by GitHub
+# after 60 days without repository activity, and it cannot tell anyone the shop
+# is down except by failing quietly here. Pair it with a free uptime monitor
+# (UptimeRobot or similar) pointed at the same URL, which pings far more often
+# and emails a human. See docs/RUNBOOK.md.
+name: Keep awake
+
+on:
+  schedule:
+    # 06:00 and 18:00 UTC. Twice a day, every day: comfortably more than
+    # "a few requests" a week, and nothing like enough traffic to matter.
+    - cron: "0 6,18 * * *"
+  # So it can be run by hand from the Actions tab to check the shop right now.
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Load the shop and confirm the database answered
+        run: |
+          set -euo pipefail
+          url="https://tahers-merch.vercel.app/"
+
+          # Retried: one failed request is usually the network, not the shop,
+          # and a false alarm twice a day trains everyone to ignore this.
+          for attempt in 1 2 3; do
+            if body=$(curl --silent --show-error --fail --max-time 30 "$url"); then
+              if printf '%s' "$body" | grep -q "تايوان يا ريس"; then
+                echo "Shop is up and the catalogue loaded from the database."
+                exit 0
+              fi
+              echo "::warning::Page loaded but no product in it (attempt $attempt)."
+            else
+              echo "::warning::Request failed (attempt $attempt)."
+            fi
+            sleep 20
+          done
+
+          echo "::error::The shop did not serve its catalogue after 3 attempts."
+          echo "Check vercel.com for the site and supabase.com for the database."
+          exit 1

@@ -139,11 +139,42 @@ cannot fill.
 | **Reserved** is high and not dropping | Payments are starting and not finishing | Flag it. Not urgent unless it is blocking stock |
 | A customer says they paid and you see nothing | Do not take their word and do not refuse them | Get the order number, check /admin, escalate before promising anything |
 | The whole site is down | Vercel or the database is having a bad day | Check vercel.com and supabase.com status. Usually fixes itself. Do not change anything |
+| The site says it cannot load the shop, and you have had a quiet week | The database has **paused itself** — see below | Supabase dashboard → the project → **Resume project**. Nothing is lost |
 
 **The rule underneath all of these:** nothing on this list is fixed by
 clicking around hopefully. If it is not on the table, write down exactly what
 you saw and ask. Guessing at a live shop that takes money is how small
 problems become expensive ones.
+
+---
+
+## 7b. The one way this shop turns itself off
+
+The website does not sleep. The **database** does.
+
+Supabase pauses a free project after about **seven days of low activity**, and
+their own guidance is that a few requests a day is enough to prevent it. A
+quiet week before launch is therefore enough to take the shop down, and the
+only warning is an email to whoever owns the Supabase account.
+
+Nothing is lost when it happens — the dashboard has a **Resume project** button
+and everything comes back. But it is off until somebody notices.
+
+Three defences, in order of how much you should rely on them:
+
+1. **A free uptime monitor** (UptimeRobot, or any like it) pointed at
+   `https://tahers-merch.vercel.app/`, checking every 5 minutes. This is the
+   one that matters: it keeps the database busy *and* emails you the moment the
+   shop stops answering. Ten minutes to set up, no card, and it is the only
+   thing here that will actually tell a human.
+2. **The Keep awake job** in this repository, which loads the shop twice a day
+   and fails if the catalogue does not come back. A backstop — GitHub switches
+   scheduled jobs off after 60 days without repository activity, and it can
+   only report by failing where nobody is looking.
+3. **Supabase Pro**, which removes automatic pausing entirely. Worth it once
+   the shop is taking real orders, not before.
+
+Do the first one before launch.
 
 ---
 
