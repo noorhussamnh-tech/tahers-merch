@@ -29,11 +29,11 @@ photography is what makes it worth visiting.
 
 ### Supplied
 
-- **Price — 950.00 EGP**, both caps, seeded as `95000` piastres.
+- **Price — 1,400.00 EGP**, both caps, seeded as `140000` piastres.
 - **Stock — 10 of each cap**, 20 in the first run.
-- **Shipping — 80.00 EGP flat**, seeded as `8000` piastres against **all 27
-  governorates**. This is the shipping company's own national rate, not an
-  estimate. The delivery area is the set of rows in `tc_shipping_zones`:
+- **Shipping — FREE**, seeded as `0` piastres against **all 27
+  governorates**. Zero is deliberate and means free; it is not an unset value.
+  The cap's price absorbs the courier. The delivery area is the set of rows in `tc_shipping_zones`:
   a governorate without one cannot be quoted and cannot be ordered to, which is
   what makes the FAQ's "every governorate in Egypt" true rather than merely
   stated. Narrow the rows and the promise breaks, so narrow the copy in the

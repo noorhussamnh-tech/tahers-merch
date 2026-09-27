@@ -7,8 +7,8 @@
 -- to run eight files by hand. Running it on a FRESH project is safe.
 --
 -- What it creates:
---   · the two caps, at 950.00 EGP, 20 in stock each, BOTH INACTIVE
---   · all 27 governorates at a flat 80.00 EGP delivery
+--   · the two caps, at 1,400.00 EGP, 20 in stock each, BOTH INACTIVE
+--   · all 27 governorates with free delivery
 --   · orders, order items, status history, payment ledger, rate limits
 --   · row-level security so the public can read the shop and nothing else
 --   · the checkout, tracking, payment and admin functions
@@ -1392,9 +1392,9 @@ grant execute on function tc_is_admin() to authenticated;
 --
 -- Every commercial figure below is real and supplied by the business:
 --
---   price     950.00 EGP  -> 95000 piastres, both caps
+--   price     1,400.00 EGP -> 140000 piastres, both caps
 --   stock     10 each     -> 20 in total
---   shipping  80.00 EGP   -> 8000 piastres, flat, every governorate
+--   shipping  FREE        -> 0 piastres, flat, every governorate
 --
 -- Earlier revisions of this seed were safe twice over: a price of zero and a
 -- stock of zero each made a sale impossible on their own. That is no longer
@@ -1405,7 +1405,7 @@ grant execute on function tc_is_admin() to authenticated;
 -- Before flipping it, see docs/PRODUCTION-CHECKLIST.md. Photography, Paymob
 -- credentials and a domain are all still outstanding.
 
--- 95000 piastres = 950.00 EGP, and 10 of each cap: a 20-piece first run.
+-- 140000 piastres = 1,400.00 EGP, and 10 of each cap: a 20-piece first run.
 --
 -- Twenty, not forty. The run was halved after the figure was first supplied,
 -- which matters more than it looks: a sell-out is now half as far away, and
@@ -1415,8 +1415,8 @@ grant execute on function tc_is_admin() to authenticated;
 -- thing between this seed and a live shop now.
 insert into tc_products (slug, name_ar, description_ar, price_piastres, stock_quantity, active, display_order)
 values
-  ('taiwan',  'تايوان يا ريس',        'كاب مطرّز بعبارة «تايوان يا ريس».',  95000, 10, false, 1),
-  ('al-adou', 'العدو ليس بهذه القوة', 'كاب مطرّز بعبارة «العدو ليس بهذه القوة ونحن لسنا بهذا الضعف».', 95000, 10, false, 2)
+  ('taiwan',  'تايوان يا ريس',        'كاب مطرّز بعبارة «تايوان يا ريس».',  140000, 10, false, 1),
+  ('al-adou', 'العدو ليس بهذه القوة', 'كاب مطرّز بعبارة «العدو ليس بهذه القوة ونحن لسنا بهذا الضعف».', 140000, 10, false, 2)
 on conflict (slug) do nothing;
 
 -- Photography.
@@ -1439,7 +1439,7 @@ select p.id, 'main', '/images/products/' || p.slug || '/main', v.alt, 1600, 1600
   ) as v(slug, alt) on v.slug = p.slug
 on conflict (product_id, view) do nothing;
 
--- Every governorate in Egypt, at a flat 80.00 EGP (8000 piastres).
+-- Every governorate in Egypt, delivered free.
 --
 -- The delivery area is exactly the set of rows in this table: a governorate
 -- without one cannot be quoted and cannot be ordered to. That is the mechanism
@@ -1451,45 +1451,48 @@ on conflict (product_id, view) do nothing;
 -- if this list is ever narrowed, narrow the copy in src/lib/catalog/copy.ts in
 -- the same change, or the site promises deliveries the checkout will refuse.
 --
--- Flat at the courier's own national rate, which is a real figure from the
--- shipping company rather than an estimate -- so unlike the 100.00 that stood
--- here before, this one is not a placeholder waiting on a rate card.
+-- ZERO MEANS FREE, AND IT MEANS IT DELIBERATELY HERE.
 --
--- It still charges the same to reach Aswan as to cross Cairo. If the courier
--- ever varies by distance, vary it per governorate in /admin rather than here.
+-- This is the one number in the file whose value is indistinguishable from a
+-- mistake: elsewhere a fee of zero is what an unconfigured zone looks like,
+-- and /admin used to warn about exactly that. Free delivery is the business
+-- decision now, the price of the cap absorbs the courier, and the warning was
+-- rewritten to match. If delivery is ever charged again, set the real figure
+-- per governorate in /admin -- and change the storefront copy in the same
+-- change, because it promises free delivery in three places.
 --
 -- The spellings come from GOVERNORATES in src/lib/domain/egypt.ts and must
 -- keep matching it exactly: the checkout sends whatever that list says, and a
 -- fee that does not match its destination is an order that cannot be placed.
 insert into tc_shipping_zones (governorate, fee_piastres, cod_available, min_days, max_days)
 values
-  ('Cairo', 8000, true, null, null),
-  ('Giza', 8000, true, null, null),
-  ('Alexandria', 8000, true, null, null),
-  ('Dakahlia', 8000, true, null, null),
-  ('Red Sea', 8000, true, null, null),
-  ('Beheira', 8000, true, null, null),
-  ('Fayoum', 8000, true, null, null),
-  ('Gharbia', 8000, true, null, null),
-  ('Ismailia', 8000, true, null, null),
-  ('Menofia', 8000, true, null, null),
-  ('Minya', 8000, true, null, null),
-  ('Qalyubia', 8000, true, null, null),
-  ('New Valley', 8000, true, null, null),
-  ('Suez', 8000, true, null, null),
-  ('Aswan', 8000, true, null, null),
-  ('Assiut', 8000, true, null, null),
-  ('Beni Suef', 8000, true, null, null),
-  ('Port Said', 8000, true, null, null),
-  ('Damietta', 8000, true, null, null),
-  ('Sharqia', 8000, true, null, null),
-  ('South Sinai', 8000, true, null, null),
-  ('Kafr El Sheikh', 8000, true, null, null),
-  ('Matrouh', 8000, true, null, null),
-  ('Luxor', 8000, true, null, null),
-  ('Qena', 8000, true, null, null),
-  ('North Sinai', 8000, true, null, null),
-  ('Sohag', 8000, true, null, null)
+  ('Cairo', 0, true, null, null),
+  ('Giza', 0, true, null, null),
+  ('Alexandria', 0, true, null, null),
+  ('Dakahlia', 0, true, null, null),
+  ('Red Sea', 0, true, null, null),
+  ('Beheira', 0, true, null, null),
+  ('Fayoum', 0, true, null, null),
+  ('Gharbia', 0, true, null, null),
+  ('Ismailia', 0, true, null, null),
+  ('Menofia', 0, true, null, null),
+  ('Minya', 0, true, null, null),
+  ('Qalyubia', 0, true, null, null),
+  ('New Valley', 0, true, null, null),
+  ('Suez', 0, true, null, null),
+  ('Aswan', 0, true, null, null),
+  ('Assiut', 0, true, null, null),
+  ('Beni Suef', 0, true, null, null),
+  ('Port Said', 0, true, null, null),
+  ('Damietta', 0, true, null, null),
+  ('Sharqia', 0, true, null, null),
+  ('South Sinai', 0, true, null, null),
+  ('Kafr El Sheikh', 0, true, null, null),
+  ('Matrouh', 0, true, null, null),
+  ('Luxor', 0, true, null, null),
+  ('Qena', 0, true, null, null),
+  ('North Sinai', 0, true, null, null),
+  ('Sohag', 0, true, null, null)
 on conflict (governorate) do nothing;
 
 -- ---------------------------------------------------------------------------

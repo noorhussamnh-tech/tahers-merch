@@ -25,6 +25,8 @@ export const NAV: readonly { label: string; to: "/" | "/track"; hash?: string }[
 /** English functional labels, fixed by the brief. */
 export const UI = {
   addToCart: "ADD TO CART",
+  /** Shown under the price. See the note on the FAQ delivery answer. */
+  freeDelivery: "FREE DELIVERY, ANYWHERE IN EGYPT",
   buyNow: "BUY NOW",
   cart: "CART",
   checkout: "CHECKOUT",
@@ -68,8 +70,15 @@ export const SHOP = {
  *     If the two disagree, the zones win and this becomes a lie. It said
  *     "Cairo and Giza only" until a courier covered the rest of the country;
  *     narrow it again and the zones must be narrowed in the same change.
- *   · `returns` says at-the-door only, delivery paid either way. That is the
- *     policy, and it is the one customers argue about.
+ *   · `returns` says at-the-door only, with "delivery fees apply in all
+ *     cases".
+ *
+ *     THAT CLAUSE PREDATES FREE DELIVERY and is now stale. It was written when
+ *     delivery cost the customer money, and meant "we do not refund it". With
+ *     delivery free there is nothing to refund, so it describes a fee that no
+ *     longer exists -- while the answer directly above it promises free
+ *     delivery. Left as the business wrote it, because rewriting it changes
+ *     the returns policy and that is not a copy edit. It needs deciding.
  *
  * Questions about the cap itself -- whether it adjusts, what it is made of --
  * were removed deliberately. Nothing here should exist that the business
@@ -80,7 +89,7 @@ export const FAQ = [
     id: "delivery",
     question: "HOW LONG DOES DELIVERY TAKE?",
     answer:
-      "We ship to every governorate in Egypt. The expected delivery time is shown at checkout before you place your order.",
+      "Delivery is free, to every governorate in Egypt. The expected delivery time is shown at checkout before you place your order.",
   },
   {
     id: "returns",

@@ -26,15 +26,17 @@ shop immediately. That flip is the last box in section 8, and it belongs there.
 
 Supplied and seeded — verify these landed rather than setting them:
 
-- [x] Price: 950.00 EGP on both caps
+- [x] Price: 1,400.00 EGP on both caps
 - [x] Stock: 10 each, 20 total
-- [x] Shipping: 80.00 EGP flat, all 27 governorates — the courier's own rate
+- [x] Shipping: free, all 27 governorates — the price absorbs the courier
 
 Still to decide:
 
-- [ ] Confirm 80 EGP is what the courier charges **everywhere**, not an
-      average. If it varies by distance, set the real per-governorate fees in
-      `/admin` → Shipping — the far ones are sold at a loss otherwise
+- [ ] **Does 1,400 still clear a margin once the courier is paid?** Delivery
+      is free to the customer, not to you. Confirm what the shipping company
+      bills per parcel and check it against the price, per governorate if they
+      vary — this is now invisible in the order total, which makes it easier
+      to lose
 - [ ] Cash-on-delivery availability — on everywhere, which is the seeded
       default rather than a decision. COD to distant governorates carries real
       refusal-rate and return-freight cost

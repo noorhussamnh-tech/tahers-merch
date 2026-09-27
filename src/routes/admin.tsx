@@ -834,14 +834,25 @@ function ShippingPanel() {
 
   if (!zones) return <p className="font-sans text-sm text-muted">Loading…</p>;
 
-  const unset = zones.filter((zone) => zone.fee === 0).length;
+  // Zero used to be treated as "nobody has set this yet" and warned about.
+  // Free delivery is the policy now, so zero is the expected value and a
+  // warning on every row would be noise that trains you to ignore this panel.
+  // What is worth flagging is the opposite: a governorate that is somehow
+  // being charged when the rest are not.
+  const charged = zones.filter((zone) => zone.fee > 0);
 
   return (
     <div className="flex flex-col gap-6">
-      {unset > 0 && (
+      {charged.length === 0 ? (
         <p className="border border-border bg-card p-4 font-sans text-sm text-muted">
-          {unset} governorate{unset === 1 ? " has" : "s have"} a fee of zero. Those ship free until
-          a real fee is entered.
+          Delivery is free everywhere. A fee of zero is the intended value — the storefront says so
+          in the FAQ and at checkout, so change one here and change that copy too.
+        </p>
+      ) : (
+        <p className="border border-signal/40 bg-card p-4 font-sans text-sm text-foreground">
+          {charged.length} governorate{charged.length === 1 ? " is" : "s are"} being charged for
+          delivery while the rest are free: {charged.map((zone) => zone.governorate).join(", ")}.
+          Deliberate, or left over?
         </p>
       )}
 

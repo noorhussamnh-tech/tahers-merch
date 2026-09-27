@@ -140,7 +140,7 @@ function PrivacyPage() {
 
         <Section title="TERMS OF SALE">
           <p>
-            <strong className="text-foreground">Delivery.</strong> We ship to every governorate in
+            <strong className="text-foreground">Delivery.</strong> Free, to every governorate in
             Egypt. The expected delivery time is shown at checkout before you place your order.
           </p>
           <p>

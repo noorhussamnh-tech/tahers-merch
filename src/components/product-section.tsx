@@ -166,6 +166,14 @@ function BuyPanel({
         <Availability available={product.available} soldOut={soldOut} />
       </div>
 
+      {/*
+        Under the price rather than in the header: it is part of what the cap
+        costs, and it answers the question at the moment a customer asks it.
+        Hidden when the price is unset -- free delivery on a product with no
+        price is noise.
+      */}
+      {!priceUnset && <p className="label-sm text-success">{UI.freeDelivery}</p>}
+
       {priceUnset ? (
         <p dir="rtl" className="font-arabic text-sm text-muted">
           سيتم الإعلان عن السعر قريبًا.

@@ -194,10 +194,10 @@ Be honest with yourself about these. They are the gap between "it works" and
   Deployments → the top one → ⋯ → **Redeploy**, then check again.
 - **No card payments.** Cash on delivery only. Paymob is built and waiting for
   an account.
-- **Delivery covers all of Egypt**, at a flat 80 EGP — the shipping
-  company's own rate. If they ever quote more for a distant governorate, change
-  that one in `/admin` → Shipping; the fee the customer pays comes from there,
-  not from the code.
+- **Delivery is free, everywhere in Egypt.** Free to the customer, not to
+  you — the cap's price is meant to absorb it. In `/admin` → Shipping every
+  governorate reads 0, and that is correct rather than unset. Charging for
+  delivery again means changing that *and* the FAQ, which promises free.
 
 ---
 
@@ -210,9 +210,10 @@ Look at these weekly. They are early warnings, not a report.
   is slower than your promises.
 - **Cancellations** — a few are normal. A pattern means something upstream is
   wrong: the price, the delivery time, or the courier.
-- **Orders from far governorates** — watch what the courier actually bills
-  against the 80 EGP charged. If the two drift apart, this is the number that
-  quietly loses money.
+- **What the courier bills you per parcel**, against the 1,400 the cap sold
+  for. Delivery no longer appears on the order at all, so this cost is now
+  invisible in your own numbers — which makes it the easiest one to lose track
+  of. Check it against the courier's invoice, not the orders list.
 
 ---
 

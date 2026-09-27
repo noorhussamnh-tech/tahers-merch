@@ -26,8 +26,8 @@ const header = `-- =============================================================
 -- to run eight files by hand. Running it on a FRESH project is safe.
 --
 -- What it creates:
---   · the two caps, at 950.00 EGP, 20 in stock each, BOTH INACTIVE
---   · all 27 governorates at a flat 80.00 EGP delivery
+--   · the two caps, at 1,400.00 EGP, 20 in stock each, BOTH INACTIVE
+--   · all 27 governorates with free delivery
 --   · orders, order items, status history, payment ledger, rate limits
 --   · row-level security so the public can read the shop and nothing else
 --   · the checkout, tracking, payment and admin functions

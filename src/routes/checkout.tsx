@@ -432,6 +432,12 @@ function CheckoutPage() {
                 <Row label="Discount" value={`− ${formatEGP(quote.discount)}`} accent />
               )}
 
+              {/*
+                A zero fee reads as "Free", never as "0 EGP". The number is
+                correct either way, but "0 EGP" beside a total looks like a
+                figure that has not loaded yet -- and free delivery is a reason
+                to buy, so it should be said rather than computed.
+              */}
               <Row
                 label="Shipping"
                 value={
@@ -439,7 +445,9 @@ function CheckoutPage() {
                     ? "Select a governorate"
                     : quote?.shippingFee === null || quote?.shippingFee === undefined
                       ? "Unavailable"
-                      : formatEGP(quote.shippingFee)
+                      : quote.shippingFee === 0
+                        ? "Free"
+                        : formatEGP(quote.shippingFee)
                 }
               />
             </dl>
