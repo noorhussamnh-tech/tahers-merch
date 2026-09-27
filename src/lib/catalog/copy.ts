@@ -70,15 +70,17 @@ export const SHOP = {
  *     If the two disagree, the zones win and this becomes a lie. It said
  *     "Cairo and Giza only" until a courier covered the rest of the country;
  *     narrow it again and the zones must be narrowed in the same change.
- *   · `returns` says at-the-door only, with "delivery fees apply in all
- *     cases".
+ *   · `returns` says at-the-door only, and says nothing about money.
  *
- *     THAT CLAUSE PREDATES FREE DELIVERY and is now stale. It was written when
- *     delivery cost the customer money, and meant "we do not refund it". With
- *     delivery free there is nothing to refund, so it describes a fee that no
- *     longer exists -- while the answer directly above it promises free
- *     delivery. Left as the business wrote it, because rewriting it changes
- *     the returns policy and that is not a copy edit. It needs deciding.
+ *     It used to end "delivery fees apply in all cases", written when
+ *     delivery cost the customer 100 EGP and meaning "we do not refund it".
+ *     Once delivery became free that described a fee that no longer existed,
+ *     directly under an answer promising free delivery. The business decided
+ *     a refusal at the door costs the customer nothing, so the clause is gone
+ *     rather than reworded: the shop absorbs the courier's wasted trip.
+ *
+ *     If that ever changes, it changes here AND in the terms on
+ *     src/routes/privacy.tsx, which says the same thing.
  *
  * Questions about the cap itself -- whether it adjusts, what it is made of --
  * were removed deliberately. Nothing here should exist that the business
@@ -95,7 +97,7 @@ export const FAQ = [
     id: "returns",
     question: "CAN I EXCHANGE OR RETURN IT?",
     answer:
-      "Exchanges and returns are only possible while the courier is still at your door. Delivery fees apply in all cases.",
+      "Exchanges and returns are only possible while the courier is still at your door, and not after.",
   },
 ] as const;
 

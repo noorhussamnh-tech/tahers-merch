@@ -150,7 +150,8 @@ function PrivacyPage() {
           </p>
           <p>
             <strong className="text-foreground">Exchanges and returns.</strong> Only possible while
-            the courier is still at your door, and not after. Delivery fees apply in all cases.
+            the courier is still at your door, and not after. Refusing an order at the door costs
+            you nothing.
           </p>
           <p>
             <strong className="text-foreground">Stock.</strong> Each design is made in a limited

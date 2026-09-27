@@ -137,6 +137,7 @@ cannot fill.
 | "Sold out" but you have stock | The stock number in /admin is wrong | /admin → products → correct the Stock number and save |
 | An order is stuck on "placed" | Nobody has clicked it along | That is section 4. Not a fault |
 | **Reserved** is high and not dropping | Payments are starting and not finishing | Flag it. Not urgent unless it is blocking stock |
+| A customer refuses the cap at the door | Nothing is owed by them — that is the policy | Cancel the order in /admin, which puts the cap back on sale. The courier's wasted trip is a cost you absorb |
 | A customer says they paid and you see nothing | Do not take their word and do not refuse them | Get the order number, check /admin, escalate before promising anything |
 | The whole site is down | Vercel or the database is having a bad day | Check vercel.com and supabase.com status. Usually fixes itself. Do not change anything |
 | The site says it cannot load the shop, and you have had a quiet week | The database has **paused itself** — see below | Supabase dashboard → the project → **Resume project**. Nothing is lost |
