@@ -11,44 +11,49 @@
 --
 -- Safe on a live shop. Nothing already ordered is affected.
 --
--- AFTER RUNNING IT, CHECK THE FEES. Every row below is 100.00 EGP, which is
--- the figure supplied when the shop only delivered across Cairo. If the
--- courier charges more to reach Upper Egypt or Sinai -- and most do -- those
--- orders are sold at a loss until the real rates are set in /admin -> Shipping.
+-- Every row below is 80.00 EGP, the courier's national rate. Note the
+-- `do nothing`: a governorate that already has a row keeps whatever fee it
+-- has, so this will NOT correct an existing row still sitting at 100.00. The
+-- update at the bottom does that.
 -- ---------------------------------------------------------------------------
 
 insert into tc_shipping_zones (governorate, fee_piastres, cod_available)
 values
-  ('Cairo', 10000, true),
-  ('Giza', 10000, true),
-  ('Alexandria', 10000, true),
-  ('Dakahlia', 10000, true),
-  ('Red Sea', 10000, true),
-  ('Beheira', 10000, true),
-  ('Fayoum', 10000, true),
-  ('Gharbia', 10000, true),
-  ('Ismailia', 10000, true),
-  ('Menofia', 10000, true),
-  ('Minya', 10000, true),
-  ('Qalyubia', 10000, true),
-  ('New Valley', 10000, true),
-  ('Suez', 10000, true),
-  ('Aswan', 10000, true),
-  ('Assiut', 10000, true),
-  ('Beni Suef', 10000, true),
-  ('Port Said', 10000, true),
-  ('Damietta', 10000, true),
-  ('Sharqia', 10000, true),
-  ('South Sinai', 10000, true),
-  ('Kafr El Sheikh', 10000, true),
-  ('Matrouh', 10000, true),
-  ('Luxor', 10000, true),
-  ('Qena', 10000, true),
-  ('North Sinai', 10000, true),
-  ('Sohag', 10000, true)
+  ('Cairo', 8000, true),
+  ('Giza', 8000, true),
+  ('Alexandria', 8000, true),
+  ('Dakahlia', 8000, true),
+  ('Red Sea', 8000, true),
+  ('Beheira', 8000, true),
+  ('Fayoum', 8000, true),
+  ('Gharbia', 8000, true),
+  ('Ismailia', 8000, true),
+  ('Menofia', 8000, true),
+  ('Minya', 8000, true),
+  ('Qalyubia', 8000, true),
+  ('New Valley', 8000, true),
+  ('Suez', 8000, true),
+  ('Aswan', 8000, true),
+  ('Assiut', 8000, true),
+  ('Beni Suef', 8000, true),
+  ('Port Said', 8000, true),
+  ('Damietta', 8000, true),
+  ('Sharqia', 8000, true),
+  ('South Sinai', 8000, true),
+  ('Kafr El Sheikh', 8000, true),
+  ('Matrouh', 8000, true),
+  ('Luxor', 8000, true),
+  ('Qena', 8000, true),
+  ('North Sinai', 8000, true),
+  ('Sohag', 8000, true)
 on conflict (governorate) do nothing;
 
--- Should return 27 rows. Read the fee column: it is what you are charging.
+-- Bring every existing row to the same rate, including ones inserted before
+-- the courier was arranged. Run this whether or not the insert above added
+-- anything.
+update tc_shipping_zones set fee_piastres = 8000;
+
+-- Should return 27 rows, all at 80. Read the fee column: it is what you charge.
 select governorate,
        fee_piastres / 100 as fee_egp,
        cod_available,

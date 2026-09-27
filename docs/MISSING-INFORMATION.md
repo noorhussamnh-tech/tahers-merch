@@ -31,14 +31,13 @@ photography is what makes it worth visiting.
 
 - **Price — 950.00 EGP**, both caps, seeded as `95000` piastres.
 - **Stock — 10 of each cap**, 20 in the first run.
-- **Shipping — 100.00 EGP flat**, seeded as `10000` piastres against **all 27
-  governorates**. The delivery area is the set of rows in `tc_shipping_zones`:
+- **Shipping — 80.00 EGP flat**, seeded as `8000` piastres against **all 27
+  governorates**. This is the shipping company's own national rate, not an
+  estimate. The delivery area is the set of rows in `tc_shipping_zones`:
   a governorate without one cannot be quoted and cannot be ordered to, which is
   what makes the FAQ's "every governorate in Egypt" true rather than merely
   stated. Narrow the rows and the promise breaks, so narrow the copy in the
-  same change. Flat because one figure was supplied, not a table of them —
-  **and a flat national rate is the open question below**, now that a courier
-  covers the whole country.
+  same change.
 - **Cap colours** — green with white thread (تايوان يا ريس), burgundy with
   cream thread (العدو ليس بهذه القوة). Recorded on `ProductContent.colour` in
   `src/lib/catalog/products.ts` and shown on each product section. The brief

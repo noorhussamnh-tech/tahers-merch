@@ -8,7 +8,7 @@
 --
 --   price     950.00 EGP  -> 95000 piastres, both caps
 --   stock     10 each     -> 20 in total
---   shipping  100.00 EGP  -> 10000 piastres, flat, every governorate
+--   shipping  80.00 EGP   -> 8000 piastres, flat, every governorate
 --
 -- Earlier revisions of this seed were safe twice over: a price of zero and a
 -- stock of zero each made a sale impossible on their own. That is no longer
@@ -53,7 +53,7 @@ select p.id, 'main', '/images/products/' || p.slug || '/main', v.alt, 1600, 1600
   ) as v(slug, alt) on v.slug = p.slug
 on conflict (product_id, view) do nothing;
 
--- Every governorate in Egypt, at a flat 100.00 EGP (10000 piastres).
+-- Every governorate in Egypt, at a flat 80.00 EGP (8000 piastres).
 --
 -- The delivery area is exactly the set of rows in this table: a governorate
 -- without one cannot be quoted and cannot be ordered to. That is the mechanism
@@ -65,43 +65,45 @@ on conflict (product_id, view) do nothing;
 -- if this list is ever narrowed, narrow the copy in src/lib/catalog/copy.ts in
 -- the same change, or the site promises deliveries the checkout will refuse.
 --
--- Flat because one figure was supplied, not a table of them. With most
--- Egyptian couriers, reaching Aswan costs more than crossing Cairo -- vary it
--- per governorate in /admin once the courier's rate card is known, rather than
--- here. See docs/MISSING-INFORMATION.md.
+-- Flat at the courier's own national rate, which is a real figure from the
+-- shipping company rather than an estimate -- so unlike the 100.00 that stood
+-- here before, this one is not a placeholder waiting on a rate card.
+--
+-- It still charges the same to reach Aswan as to cross Cairo. If the courier
+-- ever varies by distance, vary it per governorate in /admin rather than here.
 --
 -- The spellings come from GOVERNORATES in src/lib/domain/egypt.ts and must
 -- keep matching it exactly: the checkout sends whatever that list says, and a
 -- fee that does not match its destination is an order that cannot be placed.
 insert into tc_shipping_zones (governorate, fee_piastres, cod_available, min_days, max_days)
 values
-  ('Cairo', 10000, true, null, null),
-  ('Giza', 10000, true, null, null),
-  ('Alexandria', 10000, true, null, null),
-  ('Dakahlia', 10000, true, null, null),
-  ('Red Sea', 10000, true, null, null),
-  ('Beheira', 10000, true, null, null),
-  ('Fayoum', 10000, true, null, null),
-  ('Gharbia', 10000, true, null, null),
-  ('Ismailia', 10000, true, null, null),
-  ('Menofia', 10000, true, null, null),
-  ('Minya', 10000, true, null, null),
-  ('Qalyubia', 10000, true, null, null),
-  ('New Valley', 10000, true, null, null),
-  ('Suez', 10000, true, null, null),
-  ('Aswan', 10000, true, null, null),
-  ('Assiut', 10000, true, null, null),
-  ('Beni Suef', 10000, true, null, null),
-  ('Port Said', 10000, true, null, null),
-  ('Damietta', 10000, true, null, null),
-  ('Sharqia', 10000, true, null, null),
-  ('South Sinai', 10000, true, null, null),
-  ('Kafr El Sheikh', 10000, true, null, null),
-  ('Matrouh', 10000, true, null, null),
-  ('Luxor', 10000, true, null, null),
-  ('Qena', 10000, true, null, null),
-  ('North Sinai', 10000, true, null, null),
-  ('Sohag', 10000, true, null, null)
+  ('Cairo', 8000, true, null, null),
+  ('Giza', 8000, true, null, null),
+  ('Alexandria', 8000, true, null, null),
+  ('Dakahlia', 8000, true, null, null),
+  ('Red Sea', 8000, true, null, null),
+  ('Beheira', 8000, true, null, null),
+  ('Fayoum', 8000, true, null, null),
+  ('Gharbia', 8000, true, null, null),
+  ('Ismailia', 8000, true, null, null),
+  ('Menofia', 8000, true, null, null),
+  ('Minya', 8000, true, null, null),
+  ('Qalyubia', 8000, true, null, null),
+  ('New Valley', 8000, true, null, null),
+  ('Suez', 8000, true, null, null),
+  ('Aswan', 8000, true, null, null),
+  ('Assiut', 8000, true, null, null),
+  ('Beni Suef', 8000, true, null, null),
+  ('Port Said', 8000, true, null, null),
+  ('Damietta', 8000, true, null, null),
+  ('Sharqia', 8000, true, null, null),
+  ('South Sinai', 8000, true, null, null),
+  ('Kafr El Sheikh', 8000, true, null, null),
+  ('Matrouh', 8000, true, null, null),
+  ('Luxor', 8000, true, null, null),
+  ('Qena', 8000, true, null, null),
+  ('North Sinai', 8000, true, null, null),
+  ('Sohag', 8000, true, null, null)
 on conflict (governorate) do nothing;
 
 -- ---------------------------------------------------------------------------

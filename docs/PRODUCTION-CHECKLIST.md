@@ -28,21 +28,18 @@ Supplied and seeded — verify these landed rather than setting them:
 
 - [x] Price: 950.00 EGP on both caps
 - [x] Stock: 10 each, 20 total
-- [x] Shipping: 100.00 EGP flat, all 27 governorates
+- [x] Shipping: 80.00 EGP flat, all 27 governorates — the courier's own rate
 
 Still to decide:
 
-- [ ] **Does 100 EGP flat actually hold to Aswan?** The courier's rate card
-      almost certainly varies by distance. Every governorate is currently
-      quoted the same, which means the far ones may be sold at a loss. Set the
-      real per-governorate fees in `/admin` → Shipping
+- [ ] Confirm 80 EGP is what the courier charges **everywhere**, not an
+      average. If it varies by distance, set the real per-governorate fees in
+      `/admin` → Shipping — the far ones are sold at a loss otherwise
 - [ ] Cash-on-delivery availability — on everywhere, which is the seeded
       default rather than a decision. COD to distant governorates carries real
       refusal-rate and return-freight cost
 - [ ] To refuse a destination: delete its `tc_shipping_zones` row *and* narrow
       the delivery answer in `src/lib/catalog/copy.ts` in the same change
-- [ ] Whether a flat 100 EGP holds for every destination, or needs to vary once
-      the courier's rate card is known
 
 Leaving a governorate at a fee of zero means free delivery, not "unset". The
 admin Shipping tab counts how many are at zero.
